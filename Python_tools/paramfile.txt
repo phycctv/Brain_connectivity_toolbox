@@ -1,0 +1,41 @@
+
+# data information
+case = functional
+examRep = /Volumes/home2/fMRI_data/Devic/Pathologie/Patient101/Original/Exam0
+
+# Processes
+process = data preprocessing, quality check, time series extraction, graph computing
+preprocess = realign, dartel, finergrid, label
+overwrite = n
+
+
+
+# ----------------------------------------------------------------- #
+
+# case = diffusion or functional
+
+# process:
+# - diffusion (for test, to be completed):
+#	- fonction 1
+#	- fonction 2
+# - functional:
+#	- data preprocessing
+#	- quality check
+#	- time series extraction
+# 	- graph computing
+
+# preprocess: only with "data preprocessing" (useless otherwise)
+#	- realign
+#	- dartel
+#	- segment
+#	- normalize
+#       - warp
+#       - iwarp
+#       - coregister
+#       - coregister_interp
+#       - label
+#       - finergrid
+#       - iwarp_finergrid
+#       - coregister_finergrid
+
+# overwrite: y or n

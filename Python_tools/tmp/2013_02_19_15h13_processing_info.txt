@@ -1,0 +1,14 @@
+Tuesday 19 February 2013 15:13
+
+Parameters read in file /Volumes/home2/fMRI_data/Brain_connectivity_toolbox/Python_tools/paramfile.txt
+Functional fMRI data processed.
+Overwrite existing files: n
+
+Chosen functions:
+	quality check
+	time series extraction
+	graph computing
+
+Data folders:
+1. /Volumes/home2/fMRI_data/Devic/Pathologie/Patient25/Original/Exam0/
+
