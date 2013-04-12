@@ -129,7 +129,7 @@ for p in param["process"]:
 
         
 ##### add new function in this part: create instance related to this function and run it
-##### warning: functions are run in order of appearance in param["process"] 
+##### warning: functions are run in order of appearance in param["process"]  
 
         
 # -------------------------- END ------------------------------------------ #
