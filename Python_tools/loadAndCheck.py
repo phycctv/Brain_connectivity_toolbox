@@ -51,46 +51,63 @@ def loadParameter(param):
                 - repTools
                 - repR
             """
+    try:
+        if param["mode"] == "graph":       
+            # use GUI to get parameters
+            from GUIcodes import caseWindow, mainWindow
             
-    if param["mode"] == "graph":       
-        # use GUI to get parameters
-        from GUIcodes import caseWindow, mainWindow
+            # case choice
+            app = caseWindow(None,param)
+            app.title("~ Case ~")
+            app.mainloop()
+    
+            # other parameters
+            app = mainWindow(None,param)
+            app.mainloop()
+    
+        elif param["mode"] == "script":
+            # load parameters from text file
+            from readParameterFile import setParamDict
+            param = setParamDict(param)
+    
+        # if case is "functional" and data preprocessing has been chosen
+        msg = ""
+        if param["case"] == "functional":
+            # warning if some preprocessing functions can't be run
+            for i,f in enumerate(param["examRep"]):
+                for p in param["allPreprocess"]:
+                    if param["pb"][i][p]:
+                        msg +="\t- function \""+p+"\" can't be run for data in "+f+"\n"
+            if msg != "":
+                # ask user's instruction if option == "inter"
+                if param["option"] == "inter":
+                    print "WARNING :\n"+msg+"Do you want to proceed (y to pursue, n to interrupt execution)?"
+                    ans = ""
+                    while ans != "y":
+                        ans = raw_input()
+                        ans = ans.lower()
+                        if ans == "n":
+                            sys.exit("Modify data choice or SPM functions order/choice in parameter file.")
+                elif param["option"] == "indep":
+                    print "WARNING :\n"+msg
+    
+        return param
+        # exception if user clicks on the close button.
+    except KeyError:
+        return param
+## ---------------------------------------- ##
+def setMode(param):
+    """ set the "mode" of param "graph" or "script", choice to use GUI or to load parameter file
+        Return param."""
+    mode=raw_input("Please choice to use GUI or to load parameter file\n 1.Input \"script\" to use console mode.\n 2.Press Enter to use a graphical interface \n ->")
+    if mode=="script":
+        param["mode"]="script"
+        print"Mode script:\n"
+    else:
+        param["mode"]="graph"
+        print"Mode graphic:\n"
         
-        # case choice
-        app = caseWindow(None,param)
-        app.title("~ Case ~")
-        app.mainloop()
-
-        # other parameters
-        app = mainWindow(None,param)
-        app.mainloop()
-
-    elif param["mode"] == "script":
-        # load parameters from text file
-        from readParameterFile import setParamDict
-        param = setParamDict(param)
-
-    # if case is "functional" and data preprocessing has been chosen
-    msg = ""
-    if param["case"] == "functional":
-        # warning if some preprocessing functions can't be run
-        for i,f in enumerate(param["examRep"]):
-            for p in param["allPreprocess"]:
-                if param["pb"][i][p]:
-                    msg +="\t- function \""+p+"\" can't be run for data in "+f+"\n"
-        if msg != "":
-            # ask user's instruction if option == "inter"
-            if param["option"] == "inter":
-                print "WARNING :\n"+msg+"Do you want to proceed (y to pursue, n to interrupt execution)?"
-                ans = ""
-                while ans != "y":
-                    ans = raw_input()
-                    ans = ans.lower()
-                    if ans == "n":
-                        sys.exit("Modify data choice or SPM functions order/choice in parameter file.")
-            elif param["option"] == "indep":
-                print "WARNING :\n"+msg
-
+        
     return param
 
 ## ---------------------------------------- ##

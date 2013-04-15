@@ -31,13 +31,24 @@ class caseWindow(Tk):
     def __init__(self,master,param):
         """ Class constructor """ 
         Tk.__init__(self,master)
+        self.geometry("300x200+300+300")
         self.master = master
         self.param = param  
         self.initialize(master)
-        
+
+        """
+        self.frame=Frame(self, relief=RAISED, bd=1)
+        self.frame.pack(fill=BOTH, expand=1)
+
+        """
     def initialize(self,master):
         """ Creates window, with an instruction label, two radio buttons (unique choice) and buttons "Cancel" and "OK"."""
+        """frame=Frame(self, relief=RAISED, bd=1)
+        frame.pack(fill=BOTH, expand=1)
+        butOK = Button(self,text=u"OK",command=self.clickOK).pack(side=BOTTOM, padx=5, pady=5)
+        Button(self,text=u"Cancel", command=self.clickCancel).pack(side=BOTTOM)
         
+        """
         self.lift()     # display window in foreground
         label = Label(self,text="Choose case:")
         label.grid(column=0,row=0,sticky='w')
@@ -53,7 +64,8 @@ class caseWindow(Tk):
         
     def clickCancel(self):
         """ Destroy window and stop script execution."""
-        sys.exit("Cancel")
+        print"User Canceled, programme exit(0)"
+        sys.exit(0)
 
     def clickOK(self):
         """ Set case value in param["case"] and destroy window."""
@@ -165,6 +177,7 @@ class mainWindow(Tk):
     def __init__(self,master,param):
         """ Class constructor """ 
         Tk.__init__(self,master)
+        self.geometry("810x800+300+100")
         self.master = master
         self.rootRep = StringVar()
         self.rootRep.set("")
@@ -224,6 +237,7 @@ class mainWindow(Tk):
         frame = Frame(self.canvas)
         frame.rowconfigure(1, weight=1)
         frame.columnconfigure(1, weight=1)
+        frame.pack(fill=BOTH, expand=1) 
         
         # ----- choose case -------------------------------------------------------------------------------
         label = Label(frame,text="Case:")
@@ -546,7 +560,8 @@ class mainWindow(Tk):
                 if self.param["repSPM"] == "":
                     self.param["repSPM"] = tkFileDialog.askdirectory(parent=self.master,initialdir="/",title='Please select a directory for SPM:')
                 else:
-                    if not os.path.isdir(self.param["repSPM"]):
+                    if not os.path.isdir(os.path.abspath(self.param["repSPM"])+'/'):
+                        print os.path.abspath(self.param["repSPM"])+'/'
                         self.param["repSPM"] = tkFileDialog.askdirectory(parent=self.master,initialdir="/",title='Wrong directory for SPM, please select another one:') 
             else:
                 self.param["repSPM"] = tkFileDialog.askdirectory(parent=self.master,initialdir="/",title='Please select a directory for SPM:')
@@ -1204,6 +1219,7 @@ Attributes:
         # ----- available processes -----
         fl1 = Frame(self,bd=1,relief='sunken')
         fl1.grid(column=0,row=0,sticky='nsew')
+        #fl1.pack(fill=BOTH)
         Label(fl1,text="Choose functions:",justify='right',anchor="w").grid(column=0,row=0,columnspan=2,sticky='w')
         # functions list
         fbg = Frame(fl1,background='#6699FF',bd=1)

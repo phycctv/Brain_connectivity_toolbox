@@ -1,0 +1,25 @@
+Monday 15 April 2013 10:53
+
+Parameters set with GUI.
+Functional fMRI data processed.
+Overwrite existing files: n
+
+Chosen functions:
+	data preprocessing
+
+Data folders:
+1. /home/zhang/Documents/toolbox_connectivty/Original/Exam0
+
+Overwrite existing files: n
+
+Chosen SPM functions - reference file in SPM:
+	segment	-	/home/zhang/Documents/spm8/toolbox/Seg/TPM.nii 
+	normalize	-	/home/zhang/Documents/spm8/toolbox/AtlasMNI/TemGraph1_1.5.img /home/zhang/Documents/spm8/toolbox/AtlasMNI/TemGraph2_1.5.img /home/zhang/Documents/spm8/toolbox/AtlasMNI/TemGraph3_1.5.img /home/zhang/Documents/spm8/toolbox/AtlasMNI/TemGraph4_1.5.img /home/zhang/Documents/spm8/toolbox/AtlasMNI/TemGraph5_1.5.img /home/zhang/Documents/spm8/toolbox/AtlasMNI/TemGraph6_1.5.img 
+
+Functions status:
+	- segment	run
+	- normalize	run
+
+Preprocessing for data in /home/zhang/Documents/toolbox_connectivty/Original/Exam0/
+	-> matlab script: /home/zhang/Documents/toolbox_connectivty/Processed/Exam0/Jobs/preprocessing_2013_04_15_10h53.m.
+

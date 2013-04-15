@@ -1,0 +1,22 @@
+Monday 15 April 2013 10:55
+
+Parameters set with GUI.
+Functional fMRI data processed.
+Overwrite existing files: n
+
+Chosen functions:
+	data preprocessing
+	quality check
+	time series extraction
+	graph computing
+
+Data folders:
+1. /home/zhang/Documents/toolbox_connectivty/Original/Exam0
+
+Overwrite existing files: n
+
+Chosen SPM functions - reference file in SPM:
+
+Functions status:
+
+Preprocessing done - 10:57:52

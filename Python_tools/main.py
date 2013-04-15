@@ -48,6 +48,9 @@ print "      ******************************************\n"
 
 from config import settings
 param = settings()
+from loadAndCheck import setMode
+param = setMode(param)
+print param
 
 
 # ---------------------------- LOAD DATA ---------------------------------- #
@@ -60,83 +63,88 @@ print "1. Select and check data"
 from loadAndCheck import loadParameter
 param = loadParameter(param)
 
+#if param is updated by user(once param is updated, it contains processes)
+if "process" in param :
+    # ---------------------------- TEMPORARY FILE ----------------------------- #
+    # write process main parameters in temporary file
 
-# ---------------------------- TEMPORARY FILE ----------------------------- #
-# write process main parameters in temporary file
+    print "\n2. Write information in temporary file"
 
-print "\n2. Write information in temporary file"
+    crtDir = getcwd()
+    if path.exists(crtDir+"/tmp") is False:
+        mkdir(crtDir+"/tmp")
+    param["tempFileName"] = "tmp/"+startTime2+"_processing_info.txt"
+    textFile = open(param["tempFileName"],"w")
+    textFile.write(startTime+"\n\n")
+    if param["mode"] == "script":
+        textFile.write("Parameters read in file "+param["paramFile"]+"\n")
+    else:
+        textFile.write("Parameters set with GUI.\n")
+    if param["case"] == "functional":
+        textFile.write("Functional fMRI data processed.\n")
+        textFile.write("Overwrite existing files: "+param["overwrite"]+"\n")
+    else:
+        textFile.write("Diffusion fMRI data processed.\n")
+    textFile.write("\nChosen functions:")
+    #if "process" in param:  test if process in param
+    for p in param["process"]:
+        textFile.write("\n\t"+p)
+    textFile.write("\n\nData folders:\n")
+    for i,f in enumerate(param["examRep"]):
+        textFile.write(str(i+1)+". "+f+"\n")
+    textFile.write("\n")
+    textFile.close()
 
-crtDir = getcwd()
-if path.exists(crtDir+"/tmp") is False:
-    mkdir(crtDir+"/tmp")
-param["tempFileName"] = "tmp/"+startTime2+"_processing_info.txt"
-textFile = open(param["tempFileName"],"w")
-textFile.write(startTime+"\n\n")
-if param["mode"] == "script":
-    textFile.write("Parameters read in file "+param["paramFile"]+"\n")
+    print "Information saved in temporary file",param["tempFileName"],"\n"
+    param["dateTime"] = startTime2
+
+
+    # -------------------------- PROCESSING ----------------------------------- #
+    # loop on all function name in param["process"]
+    # at each step there is a loop on data sets
+
+    print "3. Data processing"
+
+    for p in param["process"]:
+
+        # ---------------------- PREPROCESSING -------------------------------- #
+        if p == "data preprocessing":
+            from functionsInfo import dataPreprocessing
+            preproc = dataPreprocessing()
+            preproc.writeScript(param)
+            preproc.run(param)
+
+        # ---------------------- QUALITY CHECK -------------------------------- #
+        elif p == "quality check":
+            from functionsInfo import QualityCheck
+            QC = QualityCheck()
+            QC.run(param)
+
+        # ---------------------- TIME SERIES ---------------------------------- #
+        elif p == "time series extraction":
+            from functionsInfo import TSExtraction
+            TS = TSExtraction(**param)
+            TS.run()
+
+        # ---------------------- GRAPH ---------------------------------------- #
+        elif p == "graph computing":
+            from functionsInfo import graphComputing
+            GC = graphComputing(**param)
+            GC.run()
+
+
+    ##### add new function in this part: create instance related to this function and run it
+    ##### warning: functions are run in order of appearance in param["process"]  
+
+
+    # -------------------------- END ------------------------------------------ #
+
+    print "End -",strftime("%H:%M")
+
+    textFile = open(param["tempFileName"],"a")
+    textFile.write("\nEnd - "+strftime("%H:%M"))
+    textFile.close()
 else:
-    textFile.write("Parameters set with GUI.\n")
-if param["case"] == "functional":
-    textFile.write("Functional fMRI data processed.\n")
-    textFile.write("Overwrite existing files: "+param["overwrite"]+"\n")
-else:
-    textFile.write("Diffusion fMRI data processed.\n")
-textFile.write("\nChosen functions:")
-for p in param["process"]:
-    textFile.write("\n\t"+p)
-textFile.write("\n\nData folders:\n")
-for i,f in enumerate(param["examRep"]):
-    textFile.write(str(i+1)+". "+f+"\n")
-textFile.write("\n")
-textFile.close()
-
-print "Information saved in temporary file",param["tempFileName"],"\n"
-param["dateTime"] = startTime2
-
-
-# -------------------------- PROCESSING ----------------------------------- #
-# loop on all function name in param["process"]
-# at each step there is a loop on data sets
-
-print "3. Data processing"
-
-for p in param["process"]:
-
-    # ---------------------- PREPROCESSING -------------------------------- #
-    if p == "data preprocessing":
-        from functionsInfo import dataPreprocessing
-        preproc = dataPreprocessing()
-        preproc.writeScript(param)
-        preproc.run(param)
-
-    # ---------------------- QUALITY CHECK -------------------------------- #
-    elif p == "quality check":
-        from functionsInfo import QualityCheck
-        QC = QualityCheck()
-        QC.run(param)
-
-    # ---------------------- TIME SERIES ---------------------------------- #
-    elif p == "time series extraction":
-        from functionsInfo import TSExtraction
-        TS = TSExtraction(**param)
-        TS.run()
-
-    # ---------------------- GRAPH ---------------------------------------- #
-    elif p == "graph computing":
-        from functionsInfo import graphComputing
-        GC = graphComputing(**param)
-        GC.run()
-
-        
-##### add new function in this part: create instance related to this function and run it
-##### warning: functions are run in order of appearance in param["process"]  
-
-        
-# -------------------------- END ------------------------------------------ #
-
-print "End -",strftime("%H:%M")
-
-textFile = open(param["tempFileName"],"a")
-textFile.write("\nEnd - "+strftime("%H:%M"))
-textFile.close()
+    print "Window closed by user, programme exit(0)"
+    exit(0)
     
