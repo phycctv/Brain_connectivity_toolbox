@@ -43,11 +43,11 @@ def settings():
     param = dict()  
     param["mode"] = "graph"
     param["option"] = "indep"
-    #param["matlabPath"] = "/Applications/MATLAB_R2008b.app/bin/"
-    #param["repSPM"] = "/Volumes/home2/Software/spm8/"
-    #param["repTools"] = "/Volumes/home2/fMRI_data/Brain_connectivity_toolbox/Matlab_tools/preproc_SPM8/"
-    #param["repR"] = "/Volumes/home2/fMRI_data/Brain_connectivity_toolbox/R_tools/"
-    #param["paramFile"] = "/Volumes/home2/fMRI_data/Brain_connectivity_toolbox/Python_tools/paramfile.txt"
+    param["matlabPath"] = "/soft/matlab/R2011b/bin/"
+    param["repSPM"] = "/home/zhang/Documents/spm8/"
+    param["repTools"] = "/home/zhang/Documents/toolbox_connectivty/Brain_connectivity_toolbox/Matlab_tools/preproc_SPM8/"
+    param["repR"] = "/home/zhang/Documents/toolbox_connectivty/Brain_connectivity_toolbox/R_tools/"
+    param["paramFile"] = "/home/zhang/Documents/toolbox_connectivty/Brain_connectivity_toolbox/Python_tools/paramfile.txt"
     
     import sys
     

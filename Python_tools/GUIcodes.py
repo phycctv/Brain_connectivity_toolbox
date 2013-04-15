@@ -256,7 +256,7 @@ class mainWindow(Tk):
         scrx.grid(column=0,row=3,sticky='new')
         self.c1dir.config(xscrollcommand=scrx.set)
         # button Research        
-        self.c1Research = Button(fcase1,text=u"Research",command=lambda case=" ":self.AddRep(case),anchor='w',state=self.case1.get())
+        self.c1Research = Button(fcase1,text=u"Research0",command=lambda case=" ":self.AddRep(case),anchor='w',state=self.case1.get())
         self.c1Research.grid(column=1,row=2,sticky='sw')
 
         # ----- case 2 : several datasets ------------------------------------------------------------------
@@ -628,14 +628,14 @@ class mainWindow(Tk):
             Otherwise the new window is a WinChooseRep object.
             In all cases, the listbox corresponding to the case is updated with new folders list."""        
         if self.case.get() == "one":
-            t = tkFileDialog.askdirectory(parent=self.master,initialdir="/",title='Please select a directory')
+            t = tkFileDialog.askdirectory(parent=self.master,initialdir="~/",title='Please select a directory')
             if t != "":
                 del self.examList
                 self.examList = list()
                 self.examList.insert(0,t)
                 list2listbox(self.c1dir,self.examList)
         elif case == "root":
-            self.rootRep.set(tkFileDialog.askdirectory(parent=self.master,initialdir="/",title='Please select a directory'))
+            self.rootRep.set(tkFileDialog.askdirectory(parent=self.master,initialdir="~/",title='Please select a directory'))
             self.updateListbox("root")
         else:
             WinChooseRep(self,case)
