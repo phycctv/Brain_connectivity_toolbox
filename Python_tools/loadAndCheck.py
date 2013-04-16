@@ -57,12 +57,12 @@ def loadParameter(param):
             from GUIcodes import caseWindow, mainWindow
             
             # case choice
-            app = caseWindow(None,param)
+            app = caseWindow(None, param)
             app.title("~ Case ~")
             app.mainloop()
     
             # other parameters
-            app = mainWindow(None,param)
+            app = mainWindow(None, param)
             app.mainloop()
     
         elif param["mode"] == "script":
@@ -74,14 +74,14 @@ def loadParameter(param):
         msg = ""
         if param["case"] == "functional":
             # warning if some preprocessing functions can't be run
-            for i,f in enumerate(param["examRep"]):
+            for i, f in enumerate(param["examRep"]):
                 for p in param["allPreprocess"]:
                     if param["pb"][i][p]:
-                        msg +="\t- function \""+p+"\" can't be run for data in "+f+"\n"
+                        msg += "\t- function \"" + p + "\" can't be run for data in " + f + "\n"
             if msg != "":
                 # ask user's instruction if option == "inter"
                 if param["option"] == "inter":
-                    print "WARNING :\n"+msg+"Do you want to proceed (y to pursue, n to interrupt execution)?"
+                    print "WARNING :\n" + msg + "Do you want to proceed (y to pursue, n to interrupt execution)?"
                     ans = ""
                     while ans != "y":
                         ans = raw_input()
@@ -89,28 +89,28 @@ def loadParameter(param):
                         if ans == "n":
                             sys.exit("Modify data choice or SPM functions order/choice in parameter file.")
                 elif param["option"] == "indep":
-                    print "WARNING :\n"+msg
+                    print "WARNING :\n" + msg
     
         return param
         # exception if user clicks on the close button.
     except KeyError:
         return param
-## ---------------------------------------- ##
+# # ---------------------------------------- ##
 def setMode(param):
     """ set the "mode" of param "graph" or "script", choice to use GUI or to load parameter file
         Return param."""
-    mode=raw_input("Please choice to use GUI or to load parameter file\n 1.Input \"script\" to use console mode.\n 2.Press Enter to use a graphical interface \n ->")
-    if mode=="script":
-        param["mode"]="script"
+    mode = raw_input("Please choice to use GUI or to load parameter file\n 1.Input \"script\" to use console mode.\n 2.Press Enter to use a graphical interface \n ->")
+    if mode == "script":
+        param["mode"] = "script"
         print"Mode script:\n"
     else:
-        param["mode"]="graph"
+        param["mode"] = "graph"
         print"Mode graphic:\n"
         
         
     return param
 
-## ---------------------------------------- ##
+# # ---------------------------------------- ##
 def checkDir(rep):
     """ Check if entry rep (string) is a path, and add if necessary symbol "/" at the end.
         If rep is empty, set path "/".
@@ -125,11 +125,11 @@ def checkDir(rep):
 
     # existence
     if not os.path.isdir(rep):
-        sys.exit("ERROR: no such directory "+rep)
+        sys.exit("ERROR: no such directory " + rep)
 
     return rep
 
-## ---------------------------------------- ##
+# # ---------------------------------------- ##
 def reduceList(l):
     """ Reduce list l in order to have only unique elements. In case of repetition, first occurence is kept.
         The method returns a message:
@@ -139,12 +139,12 @@ def reduceList(l):
     checkedList = list(set(l))
     msg = "ok"
     try:
-        assert len(checkedList)==len(l)
+        assert len(checkedList) == len(l)
     except AssertionError:
         msg = "rep"
     return msg
 
-## ---------------------------------------- ##
+# # ---------------------------------------- ##
 def checkFolderTree(examRep):
     """ For each repertory given in list examRep, check if parent folder is called "Original" and if folder contains expected sub-folders and files.
 
@@ -162,9 +162,9 @@ def checkFolderTree(examRep):
         fList = fold[0:-1].split("/")
         err = "ok"
         if len(fList) < 3:
-            err = "ERROR: folder "+fList[-1]+" not in folder Original/ as expected."        
+            err = "ERROR: folder " + fList[-1] + " not in folder Original/ as expected."        
         elif fList[-2] != "Original":
-            err = "ERROR: folder "+fList[-1]+" not in folder Original/ as expected."
+            err = "ERROR: folder " + fList[-1] + " not in folder Original/ as expected."
 
         m, filesInfo2 = checkData(fold)
         filesInfo.append(filesInfo2)
@@ -173,14 +173,14 @@ def checkFolderTree(examRep):
             if err == "ok":
                 err = m
             else:
-                err = m+"\n"+err
+                err = m + "\n" + err
 
         msg.append(err)        
     return msg, filesInfo
 
         
 
-## ---------------------------------------- ##
+# # ---------------------------------------- ##
 def checkData(dataPath):
     """ Check folders and files existence for initial data in repertory dataPath (string), and extract files base names, for functional MRI data.
 
@@ -224,18 +224,18 @@ def checkData(dataPath):
         dataPath = dataPath[0:-1]
     
     # Check sub-folders 
-    if path.exists(dataPath+"/Anat/") is False:
-        err.append("ERROR: no repertory Anat/ in "+dataPath)
-    if path.exists(dataPath+"/Functional/") is False:
-        err.append("ERROR: no repertory Functional/ in "+dataPath)
+    if path.exists(dataPath + "/Anat/") is False:
+        err.append("ERROR: no repertory Anat/ in " + dataPath)
+    if path.exists(dataPath + "/Functional/") is False:
+        err.append("ERROR: no repertory Functional/ in " + dataPath)
 
     # Check data files and their names
     if len(err) == 0:
         
         # structural data
-        anatList = glob.glob(dataPath+"/Anat/*.nii")
-        if len(anatList)!=1:
-            err.append("ERROR: no single NIFTI file in "+dataPath+"/Anat")
+        anatList = glob.glob(dataPath + "/Anat/*.nii")
+        if len(anatList) != 1:
+            err.append("ERROR: no single NIFTI file in " + dataPath + "/Anat")
         else:
             anatParts = anatList[0].split("/")
             anatParts2 = anatParts[-1].split(".")
@@ -243,9 +243,9 @@ def checkData(dataPath):
             filesInfo["anatExt"] = anatParts2[1]
             
         # functional data
-        functList = glob.glob(dataPath+"/Functional/*.nii")
-        if len(functList)==0:
-            err.append("ERROR: no NIFTI file in "+dataPath+"/Functional")
+        functList = glob.glob(dataPath + "/Functional/*.nii")
+        if len(functList) == 0:
+            err.append("ERROR: no NIFTI file in " + dataPath + "/Functional")
         else:
             # base name : common part for all files
             # comparison between first and last names
@@ -256,11 +256,11 @@ def checkData(dataPath):
             namePart21 = namePart2[-1].split(".")
             name1 = namePart11[0][0:-4]
             name2 = namePart21[0][0:-4]
-            i=0
-            while i<len(name1):
+            i = 0
+            while i < len(name1):
                 if name2.startswith(name1[0:i]):
                     functBaseName += name1[i]
-                    i+=1
+                    i += 1
                 else:
                     break
             filesInfo["functBaseName"] = functBaseName
@@ -275,8 +275,8 @@ def checkData(dataPath):
         msg = "ok"
     return msg, filesInfo
 
-## ---------------------------------------- ##
-def checkProcess(processList,processInfo,dataRep,dataInfo,overwrite):
+# # ---------------------------------------- ##
+def checkProcess(processList, processInfo, dataRep, dataInfo, overwrite):
     """ For each dataset in dataRep list, look for which function of processList list have to be applied, depending on overwrite value and existing files,
 and if a function have to be run, check if it is possible, considering existing files and those that will be created by previous functions.
 
@@ -306,12 +306,12 @@ and if a function have to be run, check if it is possible, considering existing 
     allProcessInfo = list()
 
     # for each dataset
-    for i,dataset in enumerate(dataRep):
+    for i, dataset in enumerate(dataRep):
 
-        run.insert(i,dict())
-        pb.insert(i,dict())
+        run.insert(i, dict())
+        pb.insert(i, dict())
         avFile = list()
-        allProcessInfo.insert(i,dict())
+        allProcessInfo.insert(i, dict())
 
         # for each matlab function (process p)
         for p in processList:
@@ -323,7 +323,7 @@ and if a function have to be run, check if it is possible, considering existing 
             else:
                 rep = dataset.split("/")
             patientDir = ("/").join(rep[0:-2])
-            arg["procDataRep"] = [patientDir + "/Processed/"+rep[-1]]
+            arg["procDataRep"] = [patientDir + "/Processed/" + rep[-1]]
             arg["anatBaseName"] = dataInfo[i]["anatBaseName"]
             arg["functBaseName"] = dataInfo[i]["functBaseName"]
             

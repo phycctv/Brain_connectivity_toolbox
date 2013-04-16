@@ -12,8 +12,8 @@ import sys
 import glob
 import os
 
-## ---------------------------------------- ##
-def checkFiles(param,i,option):
+# # ---------------------------------------- ##
+def checkFiles(param, i, option):
     """ Display slices of volumes created by previous steps (data preprocessing with SPM) and check if necessary files for next steps exist.
 
         Entries:
@@ -55,15 +55,15 @@ def checkFiles(param,i,option):
     [msg, files] = checkData(param["examRep"][i])
     index = param["examRep"][i].find("Original")
     patientDir = param["examRep"][i][0:index]
-    examName = checkDir(param["examRep"][i])[index+9:]
-    anatDir = patientDir+"Processed/"+examName+"Anat/"
-    functDir = patientDir+"Processed/"+examName+"Functional/"
+    examName = checkDir(param["examRep"][i])[index + 9:]
+    anatDir = patientDir + "Processed/" + examName + "Anat/"
+    functDir = patientDir + "Processed/" + examName + "Functional/"
 
     # loading files:
     #   grey matter
-    MG = glob.glob(anatDir+"Segmented/natc1"+files["anatBaseName"]+"."+files["anatExt"])
+    MG = glob.glob(anatDir + "Segmented/natc1" + files["anatBaseName"] + "." + files["anatExt"])
     #   mean time series
-    mTS = glob.glob(functDir+"Realigned/mean"+files["functBaseName"]+"*."+files["functExt"])
+    mTS = glob.glob(functDir + "Realigned/mean" + files["functBaseName"] + "*." + files["functExt"])
     #   atlasing into regions
     reg = list()
     if "coregister" in param["allPreprocess"]:
@@ -71,14 +71,14 @@ def checkFiles(param,i,option):
     if "coregister_finergrid" in param["allPreprocess"]:
         reg += glob.glob(param["allPreprocessInfo"][i]["coregister_finergrid"].endFile[1])
     if not ("coregister" in param["allPreprocess"]) and not ("coregister_finergrid" in param["allPreprocess"]):
-        reg = glob.glob(anatDir+"Atlased/natw"+"*"+files["anatBaseName"]+"."+files["anatExt"])
+        reg = glob.glob(anatDir + "Atlased/natw" + "*" + files["anatBaseName"] + "." + files["anatExt"])
     
     # display slices for each atlas used
     for f in reg:
         l0 = f.split("natw")
         l1 = l0[-1].split("u_rc1")
-        volList = mTS+MG+[f]
-        QCDir =  patientDir+"Processed/"+examName+"QC/" # folder QC to save images      
+        volList = mTS + MG + [f]
+        QCDir = patientDir + "Processed/" + examName + "QC/"  # folder QC to save images      
         if os.path.exists(QCDir) is False:
             os.mkdir(QCDir)
         
@@ -89,7 +89,7 @@ def checkFiles(param,i,option):
             delay = 10
 
         # window to show SPM processing results
-        app = WinVolShow(None,i,QCDir,volList,l1[0],delay)
+        app = WinVolShow(None, i, QCDir, volList, l1[0], delay)
         app.mainloop()
 
     # check if necessary files exist to proceed processing
@@ -97,14 +97,14 @@ def checkFiles(param,i,option):
     fct = list()
     nextStep = True
     
-    MG_MNI = glob.glob(anatDir+"Segmented/rc1"+files["anatBaseName"]+"."+files["anatExt"])
-    rFunct = glob.glob(functDir+"Realigned/r"+files["functBaseName"]+"*."+files["functExt"])
-    rpFunct = glob.glob(functDir+"Realigned/rp_"+files["functBaseName"]+"*.txt")
+    MG_MNI = glob.glob(anatDir + "Segmented/rc1" + files["anatBaseName"] + "." + files["anatExt"])
+    rFunct = glob.glob(functDir + "Realigned/r" + files["functBaseName"] + "*." + files["functExt"])
+    rpFunct = glob.glob(functDir + "Realigned/rp_" + files["functBaseName"] + "*.txt")
     
-    if (len(rFunct)==0) or (len(rpFunct)==0):
+    if (len(rFunct) == 0) or (len(rpFunct) == 0):
         nofiles.append("no realigned time series")
         fct.append("\'realign\'")
-    if len(MG_MNI)==0:
+    if len(MG_MNI) == 0:
         nofiles.append("no segmentation in grey matter")
         fct.append("\'segment\'")
     if len(reg) == 0:
@@ -112,13 +112,13 @@ def checkFiles(param,i,option):
         fct.append("\'coregister\'")
     if nofiles != list():
         nextStep = False
-        print "WARNING:  ",("\n           ").join(nofiles)
-        print "To do next processing step, SPM function(s)",(", ").join(fct),"must be run."
+        print "WARNING:  ", ("\n           ").join(nofiles)
+        print "To do next processing step, SPM function(s)", (", ").join(fct), "must be run."
         
     return nextStep
 
 
-## ---------------------------------------- ##
+# # ---------------------------------------- ##
 class WinVolShow(Tk):
     """ Window displaying superimposed volumes slices for grey matter, mean time series and atlasing files in functional space for quality check step.
 
@@ -156,8 +156,8 @@ class WinVolShow(Tk):
             - count     integer, number of second remaining in countdown (see methods poll and pausePoll)
             - ids       event, linked to countdown in method poll    """    
 
-    def __init__(self,master,setNb,QCRep,volList,figName,delay):
-        Tk.__init__(self,master)
+    def __init__(self, master, setNb, QCRep, volList, figName, delay):
+        Tk.__init__(self, master)
         self.master = master
 
         # files
@@ -168,30 +168,30 @@ class WinVolShow(Tk):
         self.nb = len(self.volList)
 
         # window
-        self.title("~ Quality check for data set "+str(setNb)+" ~")       
+        self.title("~ Quality check for data set " + str(setNb) + " ~")       
         self.delay = delay        
         self.msg = StringVar()
         self.msg.set("Wait...")
         self.state = "run"        
         
         # images
-        self.figw = 6               # images width (inches)
-        self.figh = 6               # images height
-        self.figDPI = 100           # images resolution: dots per inch
+        self.figw = 6  # images width (inches)
+        self.figh = 6  # images height
+        self.figDPI = 100  # images resolution: dots per inch
         self.posx = IntVar()
         self.posy = IntVar()
         self.posz = IntVar()
         self.posx.set("-1")
         self.hide = list()
-        for i,v in enumerate(self.volList):
-            self.hide.insert(i,IntVar())
+        for i, v in enumerate(self.volList):
+            self.hide.insert(i, IntVar())
             self.hide[i].set(0)
-        self.i = [1,1,1]
+        self.i = [1, 1, 1]
 
         # build window
         self.initialize(master)
                 
-    def initialize(self,master):
+    def initialize(self, master):
         """ Display window for quality check step.
 
             Window description:
@@ -240,89 +240,89 @@ class WinVolShow(Tk):
             """
        
         # window divided into two columns
-        self.Clmn1 = Canvas(self,width=self.figw*self.figDPI)
-        self.Clmn1.grid(row=0,column=0,sticky='nsew')
+        self.Clmn1 = Canvas(self, width=self.figw * self.figDPI)
+        self.Clmn1.grid(row=0, column=0, sticky='nsew')
         Clmn2 = Canvas(self)
-        Clmn2.grid(row=0,column=1,sticky='nsew')
+        Clmn2.grid(row=0, column=1, sticky='nsew')
 
         # ----- Column 1 -----------------------------
         # images displaying in bottom of column 1
-        canvasInit = Canvas(self.Clmn1,width=self.figw*self.figDPI,height=self.figh*self.figDPI)
-        canvasInit.grid(row=1,column=0,sticky='nsew')
+        canvasInit = Canvas(self.Clmn1, width=self.figw * self.figDPI, height=self.figh * self.figDPI)
+        canvasInit.grid(row=1, column=0, sticky='nsew')
         self.showSlices()
         
         # files names in top of column 1
-        namesFrame = Frame(self.Clmn1,bd=1,relief='sunken')
-        namesFrame.grid(row=0,column=0,sticky='nsew')
-        for i,f in enumerate(self.volList):
-            Label(namesFrame,text=str(i+1)+". "+f.split("/")[-1],justify=LEFT,anchor='w').grid(column=0,row=i,sticky='ew')
+        namesFrame = Frame(self.Clmn1, bd=1, relief='sunken')
+        namesFrame.grid(row=0, column=0, sticky='nsew')
+        for i, f in enumerate(self.volList):
+            Label(namesFrame, text=str(i + 1) + ". " + f.split("/")[-1], justify=LEFT, anchor='w').grid(column=0, row=i, sticky='ew')
 
         # ----- Column 2 -----------------------------
         # set slices transparency
-        transFrame = Frame(Clmn2,bd=1,relief='sunken')
-        transFrame.grid(row=0,column=0,sticky='nsew')
-        Label(transFrame,text="Transparency").grid(column=0,row=0,columnspan=3,sticky='ew')        
-        for i,f in enumerate(self.volList):
+        transFrame = Frame(Clmn2, bd=1, relief='sunken')
+        transFrame.grid(row=0, column=0, sticky='nsew')
+        Label(transFrame, text="Transparency").grid(column=0, row=0, columnspan=3, sticky='ew')        
+        for i, f in enumerate(self.volList):
             # files type (if exist in list self.volList)
             if f.split("/")[-1][0:4] == "mean":
-                Label(transFrame,text="Mean time series:").grid(column=0,row=i+1,sticky='new')
+                Label(transFrame, text="Mean time series:").grid(column=0, row=i + 1, sticky='new')
             elif f.split("/")[-1][0:5] == "natc1":
-                Label(transFrame,text="Grey matter:").grid(column=0,row=i+1,sticky='new')
+                Label(transFrame, text="Grey matter:").grid(column=0, row=i + 1, sticky='new')
             elif f.split("/")[-1][0:4] == "natw":
-                Label(transFrame,text="Atlasing:").grid(column=0,row=i+1,sticky='new')
+                Label(transFrame, text="Atlasing:").grid(column=0, row=i + 1, sticky='new')
             # transparency scale and "Hide" checkbutton
-            slicef = Scale(transFrame,from_=0,to=1,resolution=0.2,orient=HORIZONTAL,command=lambda x,y=i:self.setTransparency(x,y))
+            slicef = Scale(transFrame, from_=0, to=1, resolution=0.2, orient=HORIZONTAL, command=lambda x, y=i:self.setTransparency(x, y))
             slicef.set(1)     
-            slicef.grid(column=1,row=i+1,sticky='ew')
-            Checkbutton(transFrame,text="Hide",variable=self.hide[i],command=self.imSumShow).grid(column=2,row=i+1)
+            slicef.grid(column=1, row=i + 1, sticky='ew')
+            Checkbutton(transFrame, text="Hide", variable=self.hide[i], command=self.imSumShow).grid(column=2, row=i + 1)
             
         # set slices coordinates
-        viewFrame = Frame(Clmn2,bd=1,relief='sunken')
-        viewFrame.grid(row=1,column=0,sticky='nsew')
-        Label(viewFrame,text="View").grid(column=0,row=0,columnspan=4,sticky='ew')
+        viewFrame = Frame(Clmn2, bd=1, relief='sunken')
+        viewFrame.grid(row=1, column=0, sticky='nsew')
+        Label(viewFrame, text="View").grid(column=0, row=0, columnspan=4, sticky='ew')
         #   current view: labels with coordinates
-        framepos = Frame(viewFrame,bd=2)
-        framepos.grid(column=0,row=1,sticky='nsew')
-        Label(framepos,text="Current coordinates:").grid(column=0,row=0,columnspan=3,sticky='n')
-        Label(framepos,text="x").grid(column=0,row=1,sticky='sew')
-        Label(framepos,text="y").grid(column=1,row=1,sticky='sew')
-        Label(framepos,text="z").grid(column=2,row=1,sticky='sew')
-        Label(framepos,textvariable=str(self.posx),bd=2,relief='ridge').grid(column=0,row=2,sticky='new')
-        Label(framepos,textvariable=str(self.posy),bd=2,relief='ridge').grid(column=1,row=2,sticky='new')
-        Label(framepos,textvariable=str(self.posz),bd=2,relief='ridge').grid(column=2,row=2,sticky='new')   
+        framepos = Frame(viewFrame, bd=2)
+        framepos.grid(column=0, row=1, sticky='nsew')
+        Label(framepos, text="Current coordinates:").grid(column=0, row=0, columnspan=3, sticky='n')
+        Label(framepos, text="x").grid(column=0, row=1, sticky='sew')
+        Label(framepos, text="y").grid(column=1, row=1, sticky='sew')
+        Label(framepos, text="z").grid(column=2, row=1, sticky='sew')
+        Label(framepos, textvariable=str(self.posx), bd=2, relief='ridge').grid(column=0, row=2, sticky='new')
+        Label(framepos, textvariable=str(self.posy), bd=2, relief='ridge').grid(column=1, row=2, sticky='new')
+        Label(framepos, textvariable=str(self.posz), bd=2, relief='ridge').grid(column=2, row=2, sticky='new')   
         #   next view: scales for x, y and z directions
-        coordFrame = Frame(viewFrame,bd=2)
-        coordFrame.grid(column=1,row=1,rowspan=2,sticky='nsew')
-        Label(coordFrame,text="New coordinates:").grid(column=0,row=0,columnspan=2,sticky='n')
-        Label(coordFrame,text="x").grid(column=0,row=1,sticky='sew')
-        Label(coordFrame,text="y").grid(column=0,row=2,sticky='sew')
-        Label(coordFrame,text="z").grid(column=0,row=3,sticky='sew')
-        self.slicex = Scale(coordFrame,from_=0,to=self.data.shape[0],orient=HORIZONTAL)
-        self.slicey = Scale(coordFrame,from_=0,to=self.data.shape[1],orient=HORIZONTAL)
-        self.slicez = Scale(coordFrame,from_=0,to=self.data.shape[2],orient=HORIZONTAL)
+        coordFrame = Frame(viewFrame, bd=2)
+        coordFrame.grid(column=1, row=1, rowspan=2, sticky='nsew')
+        Label(coordFrame, text="New coordinates:").grid(column=0, row=0, columnspan=2, sticky='n')
+        Label(coordFrame, text="x").grid(column=0, row=1, sticky='sew')
+        Label(coordFrame, text="y").grid(column=0, row=2, sticky='sew')
+        Label(coordFrame, text="z").grid(column=0, row=3, sticky='sew')
+        self.slicex = Scale(coordFrame, from_=0, to=self.data.shape[0], orient=HORIZONTAL)
+        self.slicey = Scale(coordFrame, from_=0, to=self.data.shape[1], orient=HORIZONTAL)
+        self.slicez = Scale(coordFrame, from_=0, to=self.data.shape[2], orient=HORIZONTAL)
         self.slicex.set(self.posx.get())
         self.slicey.set(self.posy.get())
         self.slicez.set(self.posz.get())       
-        self.slicex.grid(column=1,row=1,sticky='new')
-        self.slicey.grid(column=1,row=2,sticky='new')        
-        self.slicez.grid(column=1,row=3,sticky='new')
+        self.slicex.grid(column=1, row=1, sticky='new')
+        self.slicey.grid(column=1, row=2, sticky='new')        
+        self.slicez.grid(column=1, row=3, sticky='new')
         #   set to new view: button "Update view"
-        Button(viewFrame,text=u"Update view",command=self.setViews).grid(column=0,row=2)
+        Button(viewFrame, text=u"Update view", command=self.setViews).grid(column=0, row=2)
         
         # clock and quit
-        quitFrame= Frame(Clmn2,bd=1,relief='sunken')
-        quitFrame.grid(row=2,column=0,sticky='new')        
+        quitFrame = Frame(Clmn2, bd=1, relief='sunken')
+        quitFrame.grid(row=2, column=0, sticky='new')        
         #   clock: time before window closing
-        Label(quitFrame,textvariable=self.msg,anchor='s',justify=CENTER,foreground="#7c7b85").grid(column=0,row=0,columnspan=2,sticky='ew')
-        Button(quitFrame,text=u"Pause",command=self.pausePoll).grid(column=2,row=0)
+        Label(quitFrame, textvariable=self.msg, anchor='s', justify=CENTER, foreground="#7c7b85").grid(column=0, row=0, columnspan=2, sticky='ew')
+        Button(quitFrame, text=u"Pause", command=self.pausePoll).grid(column=2, row=0)
         #   buttons to save and/or close window, and/or interrupt process
-        Button(quitFrame,text=u"save figure",command=self.svgFigure).grid(column=0,row=2)
-        Button(quitFrame,text=u"save & stop",command=self.quitInterrupt).grid(column=1,row=2)
-        Button(quitFrame,text=u"save & next",command=self.quitOK).grid(column=2,row=2)
+        Button(quitFrame, text=u"save figure", command=self.svgFigure).grid(column=0, row=2)
+        Button(quitFrame, text=u"save & stop", command=self.quitInterrupt).grid(column=1, row=2)
+        Button(quitFrame, text=u"save & next", command=self.quitOK).grid(column=2, row=2)
 
         self.update()
             
-    def poll(self,count):
+    def poll(self, count):
         """ Countdown before window closing, starts at count (entry) seconds.
 
             If self.state == "run", countdown is running, and starts at new value.
@@ -334,9 +334,9 @@ class WinVolShow(Tk):
        
         if self.state == "run":
             if count > 0 :
-                self.ids = self.after(1000,self.poll,count-1)
-                mins,secs = divmod(count,60)
-                self.msg.set("Time before closing window\n%02d:%02d        " %(mins,secs))
+                self.ids = self.after(1000, self.poll, count - 1)
+                mins, secs = divmod(count, 60)
+                self.msg.set("Time before closing window\n%02d:%02d        " % (mins, secs))
                 self.count = count
             if count == 0:
                 self.quitOK()
@@ -357,7 +357,7 @@ class WinVolShow(Tk):
             self.state = "pause"            
             self.after_cancel(self.ids)
             remTime = self.msg.get()[-13:-8]
-            self.msg.set("Time before closing window\n"+remTime+" - pause")
+            self.msg.set("Time before closing window\n" + remTime + " - pause")
         elif self.state == "pause":
             self.state = "run"
             self.poll(self.count)
@@ -366,7 +366,7 @@ class WinVolShow(Tk):
         """ Save current figure with method self.svgFigure, cancel countdown with method self.after_cancel (if event self.ids exist) and destroy window."""
         
         self.svgFigure()
-        if hasattr(self,'ids'):
+        if hasattr(self, 'ids'):
             self.after_cancel(self.ids)
         self.destroy()
 
@@ -383,11 +383,11 @@ class WinVolShow(Tk):
             File name is: "fig_" [name given in self.figName] [figure number given in self.viewNum].
             Value of self.viewNum is incremented after each neaw figure. See function checkFiles for figure names in  self.figName."""
 
-        Name = self.QCRep+"fig_"+self.figName+str(self.viewNum)+".png"
-        self.f.savefig(Name,format="png")
-        self.viewNum+=1
+        Name = self.QCRep + "fig_" + self.figName + str(self.viewNum) + ".png"
+        self.f.savefig(Name, format="png")
+        self.viewNum += 1
 
-    def setTransparency(self,val,i):
+    def setTransparency(self, val, i):
         """ Update figure with new transparency values.
 
             Transparency is adjusted by scales in column 2 of the window, each scale is linked to a file.
@@ -426,10 +426,10 @@ class WinVolShow(Tk):
         ImhXZ = zeros(self.ImXZ.shape)
 
         # voxels values with transparency and possible hidden files for each file
-        for j,v in enumerate(self.volList):
-            ImhXY[:,:,j] = self.ImXY[:,:,j]*self.i[j]*(not self.hide[j].get())
-            ImhYZ[:,:,j] = self.ImYZ[:,:,j]*self.i[j]*(not self.hide[j].get())
-            ImhXZ[:,:,j] = self.ImXZ[:,:,j]*self.i[j]*(not self.hide[j].get())
+        for j, v in enumerate(self.volList):
+            ImhXY[:, :, j] = self.ImXY[:, :, j] * self.i[j] * (not self.hide[j].get())
+            ImhYZ[:, :, j] = self.ImYZ[:, :, j] * self.i[j] * (not self.hide[j].get())
+            ImhXZ[:, :, j] = self.ImXZ[:, :, j] * self.i[j] * (not self.hide[j].get())
 
         # slices (files) summation for each view
         ImsXY = ImhXY.sum(axis=2)
@@ -437,31 +437,31 @@ class WinVolShow(Tk):
         ImsXZ = ImhXZ.sum(axis=2)
 
         # displaying 3 images on a figure: slices (xz), (yz), (xy)
-        self.f = Figure(figsize=(self.figw,self.figh),dpi=self.figDPI)
-        imAdded = self.f.add_subplot(2,2,1)
-        imAdded.imshow(ImsXZ.transpose(),origin='lower')
+        self.f = Figure(figsize=(self.figw, self.figh), dpi=self.figDPI)
+        imAdded = self.f.add_subplot(2, 2, 1)
+        imAdded.imshow(ImsXZ.transpose(), origin='lower')
         imAdded.set_title("XZ")
         imAdded.set_xlabel("x")
         imAdded.set_ylabel("z")
-        imAdded = self.f.add_subplot(2,2,2)
-        imAdded.imshow(ImsYZ.transpose(),origin='lower')
+        imAdded = self.f.add_subplot(2, 2, 2)
+        imAdded.imshow(ImsYZ.transpose(), origin='lower')
         imAdded.set_title("YZ")
         imAdded.set_xlabel("y")
         imAdded.set_ylabel("z")
-        imAdded = self.f.add_subplot(2,2,3)
-        imAdded.imshow(ImsXY.transpose(),origin='lower')
+        imAdded = self.f.add_subplot(2, 2, 3)
+        imAdded.imshow(ImsXY.transpose(), origin='lower')
         imAdded.set_title("XY")
         imAdded.set_xlabel("x")
         imAdded.set_ylabel("y")
 
         # showing figure in window
-        canvas = FigureCanvasTkAgg(self.f,master=self.Clmn1)
+        canvas = FigureCanvasTkAgg(self.f, master=self.Clmn1)
         canvas.show()
-        canvas.get_tk_widget().grid(column=0,row=1,sticky='nsew')
-        canvas._tkcanvas.grid(column=0,row=1,sticky='nsew')
+        canvas.get_tk_widget().grid(column=0, row=1, sticky='nsew')
+        canvas._tkcanvas.grid(column=0, row=1, sticky='nsew')
 
         # start or restart countdown before closing window
-        if hasattr(self,'ids'):
+        if hasattr(self, 'ids'):
             self.after_cancel(self.ids)
             self.poll(self.delay)
         else:
@@ -516,37 +516,37 @@ class WinVolShow(Tk):
 
         # first reference ccordinates
         if self.posx.get() == -1:
-            self.posx.set(self.data.shape[0]/2)
-            self.posy.set(self.data.shape[1]/2)
-            self.posz.set(self.data.shape[2]/2)
+            self.posx.set(self.data.shape[0] / 2)
+            self.posy.set(self.data.shape[1] / 2)
+            self.posz.set(self.data.shape[2] / 2)
 
         # matrixes initialization
-        self.ImXY = zeros((self.data.shape[0],self.data.shape[1],self.nb))
-        self.ImYZ = zeros((self.data.shape[1],self.data.shape[2],self.nb))
-        self.ImXZ = zeros((self.data.shape[0],self.data.shape[2],self.nb))  
+        self.ImXY = zeros((self.data.shape[0], self.data.shape[1], self.nb))
+        self.ImYZ = zeros((self.data.shape[1], self.data.shape[2], self.nb))
+        self.ImXZ = zeros((self.data.shape[0], self.data.shape[2], self.nb))  
 
         # normalized slices
-        for i,v in enumerate(self.volList):
+        for i, v in enumerate(self.volList):
 
             # volume loading
             vol = nib.load(v)
             data = vol.get_data()
 
             # nan are suppressed
-            data = ma.where(~isnan(data),data,array(zeros(data.shape)))
+            data = ma.where(~isnan(data), data, array(zeros(data.shape)))
 
             # volume normalization
             mindata = data.min()
-            dataNorm = data-mindata
+            dataNorm = data - mindata
             maxdata = dataNorm.max()
-            dataNorm = dataNorm/maxdata
+            dataNorm = dataNorm / maxdata
             mindata = dataNorm.min()
             maxdata = dataNorm.max()
 
             # slices extraction from volume
-            self.ImXY[:,:,i] = dataNorm[:,:,self.posz.get()]
-            self.ImYZ[:,:,i] = dataNorm[self.posx.get(),:,:]
-            self.ImXZ[:,:,i] = dataNorm[:,self.posy.get(),:]
+            self.ImXY[:, :, i] = dataNorm[:, :, self.posz.get()]
+            self.ImYZ[:, :, i] = dataNorm[self.posx.get(), :, :]
+            self.ImXZ[:, :, i] = dataNorm[:, self.posy.get(), :]
 
         # show images
         self.imSumShow()

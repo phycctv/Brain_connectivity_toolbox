@@ -135,9 +135,9 @@ def setParamDict(param):
             for p in paramStr[pname].split(","):
                 param[pname].append(fctInfo.fctName(p))
                 if param[pname][-1] == "error":
-                    sys.exit("ERROR: function \""+p+"\" not identified, correct \"process\" in parameter file.")
+                    sys.exit("ERROR: function \"" + p + "\" not identified, correct \"process\" in parameter file.")
                 elif param[pname][-1] not in fctInfo.fctList(paramStr["case"]):
-                    sys.exit("ERROR: function \""+p+"\" not defined for case \""+paramStr["case"]+"\".")
+                    sys.exit("ERROR: function \"" + p + "\" not defined for case \"" + paramStr["case"] + "\".")
         elif pname == "preprocess":
             param[pname] = paramStr[pname].split(",")
         
@@ -154,7 +154,7 @@ def setParamDict(param):
                 param[pname] = list()
                 for f in fList:
                     param[pname].append(checkDir(f))
-                if len(param[pname])==0:
+                if len(param[pname]) == 0:
                     sys.exit("ERROR: no data folder!\nGive at least one directory to dataset in parameter \'examRep\'.")                    
                         
             # SPM, matlab or R functions folders
@@ -185,7 +185,7 @@ def setParamDict(param):
         if "data preprocessing" not in param["process"]:
             print "WARNING: process \"data preprocessing\" not found, no function in \"preprocess\" will be run."
         else:
-            i=0
+            i = 0
             from matlabFct import functions, SPMfct
             
             # check directory to SPM folder, necessary for preprocessing
@@ -212,14 +212,14 @@ def setParamDict(param):
                 for f in functions(p):
                     # function information
                     param["allPreprocess"].append(f)
-                    generalProcessInfo[f]=SPMfct(f,**arg)
+                    generalProcessInfo[f] = SPMfct(f, **arg)
                     generalProcessInfo[f].nb = i
                     generalProcessInfo[f].parent = p
                     # reference files existence
                     for t in generalProcessInfo[f].template["name"]:
                         if (t != "") and (not path.isfile(t)):
-                            sys.exit("ERROR "+t+": no such file, check "+generalProcessInfo[f].template["param"]+" in parameter file.")    
-                    i+=1
+                            sys.exit("ERROR " + t + ": no such file, check " + generalProcessInfo[f].template["param"] + " in parameter file.")    
+                    i += 1
 
         # redondancy in processes list
         from loadAndCheck import reduceList
@@ -236,12 +236,12 @@ def setParamDict(param):
 
     # Check data folders
     msg, dataInfo = checkFolderTree(param["examRep"])
-    for i,m in enumerate(msg):
+    for i, m in enumerate(msg):
         if m[0:5] == "ERROR":
-            sys.exit(m+"\n   -> check data or parameter file.")
+            sys.exit(m + "\n   -> check data or parameter file.")
 
     # Check functions consistency for data preprocessing
-    param["run"], param["pb"], param["allPreprocessInfo"] = checkProcess(param["allPreprocess"],generalProcessInfo,param["examRep"],dataInfo,param["overwrite"])
+    param["run"], param["pb"], param["allPreprocessInfo"] = checkProcess(param["allPreprocess"], generalProcessInfo, param["examRep"], dataInfo, param["overwrite"])
         
     return param
 
@@ -283,8 +283,8 @@ def loadParam(name):
 
     # parameter file
     if not path.exists(name):
-        sys.exit("ERROR for parameter file: no such file \'"+name+"\'.\n -> Correct it in config.py.")
-    paramFile = open(name,"r")
+        sys.exit("ERROR for parameter file: no such file \'" + name + "\'.\n -> Correct it in config.py.")
+    paramFile = open(name, "r")
     text = paramFile.read()
 
     # read text line by line
@@ -292,25 +292,25 @@ def loadParam(name):
     paramList = list()
     for elt in lines:
         # remove empty lines, lines begining with # and lines without symbol =
-        if (elt!="") and (elt.find("#",0,1)!=0) and (elt.isspace() is False) and (elt.find("=",0)!=-1):
+        if (elt != "") and (elt.find("#", 0, 1) != 0) and (elt.isspace() is False) and (elt.find("=", 0) != -1):
             paramList.append(elt)
 
     # if empty file, error
     if len(paramList) < 1:
-        sys.exit("No paramaters found in "+name+".\nDefine at least directory to exam folder(s) for data to be processed in examRep.")
+        sys.exit("No paramaters found in " + name + ".\nDefine at least directory to exam folder(s) for data to be processed in examRep.")
 
     # extract parameters value
     paramDict = findKeyWords(paramList)
 
     # message: parameter list
-    print "Parameters found in "+name+":"
+    print "Parameters found in " + name + ":"
     for key in paramDict:
-        print "\t-",key
+        print "\t-", key
     print "Default values will be taken for other parameters."
 
     return paramDict
 
-## ---------------------------------------- ##
+# # ---------------------------------------- ##
 def findKeyWords(paramList):
     """ Comparison between strings of list paramList (entry) and elements of reference list KWlist.
         Spaces are suppressed. This method reads first letters before symbol "=", and compare it with words in KWlist.
@@ -320,9 +320,9 @@ def findKeyWords(paramList):
         In case of mutiple instances of a parameter name in paramList, it gets only the last value."""
 
     # keywords list -> complete this list to add new parameter names
-    KWlist = ["case","examRep","process","preprocess","overwrite","templ_segment","templ_normalize",
-             "templ_iwarp","templ_iwarp_dartel","templ_iwarp_finergrid","templ_label",
-             "repSPM","repTools","repR"]
+    KWlist = ["case", "examRep", "process", "preprocess", "overwrite", "templ_segment", "templ_normalize",
+             "templ_iwarp", "templ_iwarp_dartel", "templ_iwarp_finergrid", "templ_label",
+             "repSPM", "repTools", "repR"]
 
     paramDict = {}  # for parameters
     checkDict = {}  # parameters counter
@@ -335,20 +335,20 @@ def findKeyWords(paramList):
         eltParam = "".join(eltParam.split(" "))
 
         for eltKey in KWlist:
-            if eltParam.find(eltKey,0)==0:
+            if eltParam.find(eltKey, 0) == 0:
                 # parameter name before symbol "="
-                i = eltParam.find("=",len(eltKey),len(eltKey)+1)
+                i = eltParam.find("=", len(eltKey), len(eltKey) + 1)
 
                 # words matching
-                if i==len(eltKey):
+                if i == len(eltKey):
 
                     # statement
                     checkDict[eltKey] += 1
                     if checkDict[eltKey] > 1:
-                        print " WARNING!",eltKey,": parameter defined at least twice, last value selected."
+                        print " WARNING!", eltKey, ": parameter defined at least twice, last value selected."
 
                     # parameter value : between "=" and "#" or end of line
-                    value = eltParam[i+1:len(eltParam)]
+                    value = eltParam[i + 1:len(eltParam)]
                     valueList = value.split("#")
                     value = valueList[0]
                     paramDict[eltKey] = value

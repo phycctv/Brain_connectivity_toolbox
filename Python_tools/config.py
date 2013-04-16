@@ -54,12 +54,12 @@ def settings():
     # check values for mandatory variables
     if "mode" in param:
         if (param["mode"] != "graph") and (param["mode"] != "script"):
-            sys.exit("ERROR: \""+param["mode"]+"\" wrong value for variable mode in config.py\n -> should be \"graph\" or \"script\"")
+            sys.exit("ERROR: \"" + param["mode"] + "\" wrong value for variable mode in config.py\n -> should be \"graph\" or \"script\"")
     else:
         sys.exit("ERROR: define value for variable mode in config.py, \"graph\" or \"script\"")
     if "option" in param:
         if (param["option"] != "inter") and (param["option"] != "indep"):
-            sys.exit("ERROR: \""+param["option"]+"\" wrong value for variable option in config.py\n -> should be \"inter\" or \"indep\"")
+            sys.exit("ERROR: \"" + param["option"] + "\" wrong value for variable option in config.py\n -> should be \"inter\" or \"indep\"")
     else:
         sys.exit("ERROR: define value for variable option in config.py, \"inter\" or \"indep\"")
         

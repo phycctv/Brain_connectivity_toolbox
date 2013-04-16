@@ -31,7 +31,7 @@ version 2.0
 
 """
 
-from os import mkdir,path,getcwd
+from os import mkdir, path, getcwd
 from time import strftime
 
 startTime = strftime("%A %d %B %Y %H:%M")
@@ -63,7 +63,7 @@ print "1. Select and check data"
 from loadAndCheck import loadParameter
 param = loadParameter(param)
 
-#if param is updated by user(once param is updated, it contains processes)
+# if param is updated by user(once param is updated, it contains processes)
 if "process" in param :
     # ---------------------------- TEMPORARY FILE ----------------------------- #
     # write process main parameters in temporary file
@@ -71,31 +71,31 @@ if "process" in param :
     print "\n2. Write information in temporary file"
 
     crtDir = getcwd()
-    if path.exists(crtDir+"/tmp") is False:
-        mkdir(crtDir+"/tmp")
-    param["tempFileName"] = "tmp/"+startTime2+"_processing_info.txt"
-    textFile = open(param["tempFileName"],"w")
-    textFile.write(startTime+"\n\n")
+    if path.exists(crtDir + "/tmp") is False:
+        mkdir(crtDir + "/tmp")
+    param["tempFileName"] = "tmp/" + startTime2 + "_processing_info.txt"
+    textFile = open(param["tempFileName"], "w")
+    textFile.write(startTime + "\n\n")
     if param["mode"] == "script":
-        textFile.write("Parameters read in file "+param["paramFile"]+"\n")
+        textFile.write("Parameters read in file " + param["paramFile"] + "\n")
     else:
         textFile.write("Parameters set with GUI.\n")
     if param["case"] == "functional":
         textFile.write("Functional fMRI data processed.\n")
-        textFile.write("Overwrite existing files: "+param["overwrite"]+"\n")
+        textFile.write("Overwrite existing files: " + param["overwrite"] + "\n")
     else:
         textFile.write("Diffusion fMRI data processed.\n")
     textFile.write("\nChosen functions:")
-    #if "process" in param:  test if process in param
+    # if "process" in param:  test if process in param
     for p in param["process"]:
-        textFile.write("\n\t"+p)
+        textFile.write("\n\t" + p)
     textFile.write("\n\nData folders:\n")
-    for i,f in enumerate(param["examRep"]):
-        textFile.write(str(i+1)+". "+f+"\n")
+    for i, f in enumerate(param["examRep"]):
+        textFile.write(str(i + 1) + ". " + f + "\n")
     textFile.write("\n")
     textFile.close()
 
-    print "Information saved in temporary file",param["tempFileName"],"\n"
+    print "Information saved in temporary file", param["tempFileName"], "\n"
     param["dateTime"] = startTime2
  
 
@@ -139,10 +139,10 @@ if "process" in param :
 
     # -------------------------- END ------------------------------------------ #
 
-    print "End -",strftime("%H:%M")
+    print "End -", strftime("%H:%M")
 
-    textFile = open(param["tempFileName"],"a")
-    textFile.write("\nEnd - "+strftime("%H:%M"))
+    textFile = open(param["tempFileName"], "a")
+    textFile.write("\nEnd - " + strftime("%H:%M"))
     textFile.close()
 else:
     print "Window closed by user, programme exit(0)"
