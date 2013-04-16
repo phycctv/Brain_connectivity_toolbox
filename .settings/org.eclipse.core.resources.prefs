@@ -1,6 +1,7 @@
 eclipse.preferences.version=1
 encoding//Python_tools/GUIcodes.py=utf-8
 encoding//Python_tools/GUItools.py=utf-8
+encoding//Python_tools/codeMatlab.py=iso-8859-1
 encoding//Python_tools/config.py=utf-8
 encoding//Python_tools/functionsInfo.py=utf-8
 encoding//Python_tools/loadAndCheck.py=utf-8
