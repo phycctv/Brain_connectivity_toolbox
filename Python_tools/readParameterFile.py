@@ -283,7 +283,7 @@ def loadParam(name):
 
     # parameter file
     if not path.exists(name):
-        sys.exit("ERROR for parameter file: no such file \'" + name + "\'.\n -> Correct it in config.py.")
+        sys.exit("ERROR for parameter file: no such file '"  + name + "' .\n -> Correct it in config.py.")
     paramFile = open(name, "r")
     text = paramFile.read()
 

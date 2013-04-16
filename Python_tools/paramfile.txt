@@ -1,7 +1,7 @@
 
 # data information
 case = functional
-examRep = /Volumes/home2/fMRI_data/Devic/Pathologie/Patient101/Original/Exam0
+examRep = /home/zhang/Documents/toolbox_connectivty/Original/Exam0
 
 # Processes
 process = data preprocessing, quality check, time series extraction, graph computing

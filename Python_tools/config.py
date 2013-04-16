@@ -44,9 +44,9 @@ def settings():
     param["mode"] = "graph"
     param["option"] = "indep"
     param["matlabPath"] = "/soft/matlab/R2011b/bin/"
-    param["repSPM"] = "../../spm8/"
-    param["repTools"] = "../Matlab_tools/preproc_SPM8/"
-    param["repR"] = "../R_tools/"
+    param["repSPM"] = "/home/zhang/workspace/spm8/"
+    param["repTools"] = "/home/zhang/workspace/Brain_connectivity_toolbox/Matlab_tools/preproc_SPM8/"
+    param["repR"] = "/home/zhang/workspace/Brain_connectivity_toolbox/R_tools/"
     param["paramFile"] = "./paramfile.txt"
     
     import sys

@@ -213,7 +213,7 @@ class SPMfct():
                 self.template["name"] = arg[self.template["param"]]
             else:
                 self.template["name"] = [self.repSPM+"toolbox/Atlas/Template.nii"]
-        elif self.name == "coregister_finergrid":   # coregister finergrid
+        elif self.name == "coregister_finergrid":   # coregister finergrid*********************************************
             self.name = "iwarp_finergrid"
             self.updateTempl(**arg)
             self.name = "coregister_finergrid"

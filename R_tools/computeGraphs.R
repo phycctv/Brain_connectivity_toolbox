@@ -27,8 +27,8 @@ compute_MST <- function(Rpath,path,n.regions){
 	library('brainwaver')
 	
 ######### modif: igraph or igrahp0
-	#library('igraph0')
-	library('igraph')
+	library('igraph0')
+	#library('igraph')
 #########
 	library('methods')###############################################
 	
@@ -284,8 +284,8 @@ read_results <- function(Rpath,path,n.regions){
 	
 	library(Cairo)
 ######### modif: igraph or igrahp0
-	#library('igraph0')
-	library('igraph')
+	library('igraph0')
+	#library('igraph')
 #########
 	library('methods')###############################################
 	
