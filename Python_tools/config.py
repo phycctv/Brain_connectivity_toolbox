@@ -2,6 +2,7 @@
 # -*- coding: utf-8 -*-
 
 # ---------------------------------------------------- #
+import sys
 def settings():
     
     """ Settings for main.py execution.
@@ -39,17 +40,18 @@ def settings():
         - paramFile     path and name to parameters file
                         mandatory if mode == "script"
     """
-
+    import os
     param = dict()  
     param["mode"] = "graph"
     param["option"] = "indep"
+    pythonPath = os.path.split(os.path.realpath(__file__))[0]
+    print "Python workspace : " + pythonPath
     param["matlabPath"] = "/soft/matlab/R2011b/bin/"
-    param["repSPM"] = "/home/zhang/workspace/spm8/"
-    param["repTools"] = "/home/zhang/workspace/Brain_connectivity_toolbox/Matlab_tools/preproc_SPM8/"
-    param["repR"] = "/home/zhang/workspace/Brain_connectivity_toolbox/R_tools/"
-    param["paramFile"] = "./paramfile.txt"
+    param["repSPM"] = os.path.realpath(pythonPath +"/../../spm8/")
+    param["repTools"] = os.path.realpath(pythonPath +"/../Matlab_tools/preproc_SPM8/")
+    param["repR"] = os.path.realpath(pythonPath +"/../R_tools/")
+    param["paramFile"] = os.path.realpath(pythonPath +"/paramfile.txt")
     
-    import sys
     
     # check values for mandatory variables
     if "mode" in param:
