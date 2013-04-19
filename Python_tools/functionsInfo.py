@@ -156,6 +156,7 @@ class dataPreprocessing():
                     stdoutdata, stderrdata = cmd.communicate()
                     
                     #compatibility for windows
+                    import sys
                     if sys.platform == "win32":
                         print("Please wait until the Matlab script is finished, then press any key to continue")
                         import os
