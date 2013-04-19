@@ -1,0 +1,15 @@
+Thursday 18 April 2013 19:07
+
+Parameters set with GUI.
+Functional fMRI data processed.
+Overwrite existing files: n
+
+Chosen functions:
+	graph computing
+
+Data folders:
+1. C:/Users/phycctv/Documents/NetBeansProjects/Original/Exam0
+
+Graph computing done - 19:10:02
+
+End - 19:10

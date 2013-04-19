@@ -769,7 +769,7 @@ class mainWindow(Tk):
         elif self.examList[0] == "":
             tkMessageBox.showwarning(title="Warning", message="No data folder!\nGive at least one directory to dataset.")
         else:
-
+            
             e = "ok"
             txt = ""
 
@@ -837,8 +837,8 @@ class mainWindow(Tk):
                         self.param["run"] = run
                         self.param["pb"] = pb                   
                         self.destroy()
+                       
             
-
 # ----------------------------------------------------------------------------------- #
 class WinChooseRep(Toplevel):
     """ Window for folder(s) selection, from parent folder. Main window is updated when "OK" is clicked.

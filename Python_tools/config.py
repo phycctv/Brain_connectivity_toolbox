@@ -46,7 +46,7 @@ def settings():
     param["option"] = "indep"
     pythonPath = os.path.split(os.path.realpath(__file__))[0]
     print "Python workspace : " + pythonPath
-    param["matlabPath"] = "/soft/matlab/R2011b/bin/"
+    param["matlabPath"] = "H:/matlab2012/bin/"
     param["repSPM"] = os.path.realpath(pythonPath +"/../../spm8/")
     param["repTools"] = os.path.realpath(pythonPath +"/../Matlab_tools/preproc_SPM8/")
     param["repR"] = os.path.realpath(pythonPath +"/../R_tools/")

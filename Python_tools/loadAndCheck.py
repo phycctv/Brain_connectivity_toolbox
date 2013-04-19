@@ -168,7 +168,7 @@ def checkFolderTree(examRep):
 
         m, filesInfo2 = checkData(fold)
         filesInfo.append(filesInfo2)
-
+        
         if m != "ok":
             if err == "ok":
                 err = m
@@ -237,7 +237,11 @@ def checkData(dataPath):
         if len(anatList) != 1:
             err.append("ERROR: no single NIFTI file in " + dataPath + "/Anat")
         else:
-            anatParts = anatList[0].split("/")
+            #compatibility for windows
+            if sys.platform == "win32":
+                anatParts = anatList[0].split("\\")
+            else:
+                anatParts = anatList[0].split("/")
             anatParts2 = anatParts[-1].split(".")
             filesInfo["anatBaseName"] = anatParts2[0]
             filesInfo["anatExt"] = anatParts2[1]
@@ -263,6 +267,9 @@ def checkData(dataPath):
                     i += 1
                 else:
                     break
+            #compatibility for windows
+            if sys.platform == "win32":
+                functBaseName = functBaseName.split("\\")[-1]
             filesInfo["functBaseName"] = functBaseName
             functParts = functList[0].split("/")
             functParts2 = functParts[-1].split(".")

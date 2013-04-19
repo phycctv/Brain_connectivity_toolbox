@@ -149,11 +149,17 @@ class dataPreprocessing():
                     fct2 = self.matlabFile.split("/")[-1][0:-2] + ";"
                     quitmat = "quit\""
                     matlabCmd = runmat + path1 + path2 + fct1 + fct2 + quitmat
-            
+
                     # running script
                     print "Matlab script running at " + strftime("%H:%M:%S")
                     cmd = subprocess.Popen(matlabCmd, shell=True)  # display matlab messages on shell
                     stdoutdata, stderrdata = cmd.communicate()
+                    
+                    #compatibility for windows
+                    if sys.platform == "win32":
+                        print("Please wait until the Matlab script is finished, then press any key to continue")
+                        import os
+                        os.system('pause') 
             else:
                 print "\n-------------------- \ndataset:", dataset, "not processed"
         textFile = open(param["tempFileName"], "a")
@@ -300,6 +306,12 @@ class graphComputing():
             r = robjects.r
             print("***** Start compute measures")
             r.source(self.repR + "/computeGraphs.R")
+
+            #compatibility for windows
+            if sys.platform == "win32":
+                import os
+                import sys
+                os.mkdir( self.resultRep[i] + "/Graph_Measures/")
             r.compute_MST(self.repR, self.resultRep[i], self.nbReg)
 
     def DoGraphs(self, i):
