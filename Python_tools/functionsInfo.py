@@ -308,9 +308,10 @@ class graphComputing():
             r.source(self.repR + "/computeGraphs.R")
 
             #compatibility for windows
+            import sys
             if sys.platform == "win32":
                 import os
-                import sys
+
                 os.mkdir( self.resultRep[i] + "/Graph_Measures/")
             r.compute_MST(self.repR, self.resultRep[i], self.nbReg)
 
