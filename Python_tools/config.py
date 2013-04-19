@@ -44,14 +44,14 @@ def settings():
     param = dict()  
     param["mode"] = "graph"
     param["option"] = "indep"
-    pythonPath = os.path.split(os.path.realpath(__file__))[0]
-    print "Python workspace : " + pythonPath
-    param["matlabPath"] = "H:/matlab2012/bin/"
-    param["repSPM"] = os.path.realpath(pythonPath +"/../../spm8/")
-    param["repTools"] = os.path.realpath(pythonPath +"/../Matlab_tools/preproc_SPM8/")
-    param["repR"] = os.path.realpath(pythonPath +"/../R_tools/")
-    param["paramFile"] = os.path.realpath(pythonPath +"/paramfile.txt")
-    
+    sourcePath = os.path.split(os.path.realpath(__file__))[0]
+    print "Source workspace : " + sourcePath
+    param["matlabPath"] = "/soft/matlab/R2011b/bin/"
+    param["repSPM"] = os.path.realpath(sourcePath +"/../../spm8/")
+    param["repTools"] = os.path.realpath(sourcePath +"/../Matlab_tools/preproc_SPM8/")
+    param["repR"] = os.path.realpath(sourcePath +"/../R_tools/")
+    param["paramFile"] = os.path.realpath(sourcePath +"/paramfile.txt")
+
     
     # check values for mandatory variables
     if "mode" in param:

@@ -1,6 +1,0 @@
-Saturday 13 April 2013 16:44
-
-Parameters set with GUI.
-Diffusion fMRI data processed.
-
-Chosen functions:
