@@ -1463,6 +1463,7 @@ Warning : all changes done in reference files with this class are lost when user
 
         fileName = tkFileDialog.askopenfilenames(parent=self, initialdir=self.master.param["repSPM"], title='Please select file(s) for ' + f)      
         if (fileName != "") and (fileName != ()):
+            print fileName
             self.templName[i].set(list2text(fileName))
 
     def clickOK(self):

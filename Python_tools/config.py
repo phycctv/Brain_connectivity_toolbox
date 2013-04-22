@@ -47,6 +47,8 @@ def settings():
     sourcePath = os.path.split(os.path.realpath(__file__))[0]
     print "Source workspace : " + sourcePath
     param["matlabPath"] = "/soft/matlab/R2011b/bin/"
+    if sys.platform == "win32" :
+        param["matlabPath"] = "H:/matlab2012/bin/"
     param["repSPM"] = os.path.realpath(sourcePath +"/../../spm8/")
     param["repTools"] = os.path.realpath(sourcePath +"/../Matlab_tools/preproc_SPM8/")
     param["repR"] = os.path.realpath(sourcePath +"/../R_tools/")
