@@ -31,7 +31,9 @@ class caseWindow(Tk):
     def __init__(self, master, param):
         """ Class constructor """ 
         Tk.__init__(self, master)
-        self.geometry("300x200+300+300")
+        scnWidth,scnHeight = self.maxsize() # get screen width and height
+        tmpcnf = '%dx%d+%d+%d'%(240,100,(scnWidth-300)/2,(scnHeight-200)/2)
+        self.geometry(tmpcnf)
         self.master = master
         self.param = param  
         self.initialize(master)
@@ -177,7 +179,15 @@ class mainWindow(Tk):
     def __init__(self, master, param):
         """ Class constructor """ 
         Tk.__init__(self, master)
-        self.geometry("810x800+300+100")
+        scnWidth,scnHeight = self.maxsize() # get screen width and height
+        width = 710
+        height = 800
+        if scnWidth<width:
+            width = scnWidth-60
+        if scnHeight<height:
+            height = scnHeight-100
+        tmpcnf = '%dx%d+%d+%d'%(width,height,(scnWidth-width)/2-20,(scnHeight-height)/2-40)
+        self.geometry(tmpcnf)
         self.master = master
         self.rootRep = StringVar()
         self.rootRep.set("")
@@ -1284,8 +1294,10 @@ Attributes:
         """ Select all elements of listbAv, except for 'dartel' and 'finergrid', to have a list of all possible functions without repetitions.
             Called by button "Select all"."""
         for i, f in enumerate(self.listbAv.get(0, END)):
-            if (f != "dartel") and (f != "finergrid"):
+            if (f != "dartel") and (f != "finergrid") and (f != "label"):
                 self.listbAv.selection_set(i)
+            else:
+                self.listbAv.selection_clear(i)
                 
     def addElt(self):
         """ Add selected elements of avFctList at the end of selFctList. listbSel and listbNb are updated.
@@ -1293,7 +1305,8 @@ Attributes:
         item = map(int, self.listbAv.curselection())
         if item != []:
             for i in item:
-                self.selFctList.append(self.avFctList[i])
+                if not self.avFctList[i] in self.selFctList: # to avoid that there are two same task
+                    self.selFctList.append(self.avFctList[i])
             list2listbox(self.listbSel, self.selFctList)
             numListbox2listbox(self.listbSel, self.listbNb)
 
