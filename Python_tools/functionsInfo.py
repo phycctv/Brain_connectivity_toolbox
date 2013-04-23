@@ -143,9 +143,9 @@ class dataPreprocessing():
            
                     # matlab command
                     if "matlabPath" in param:
-                        runmat = param["matlabPath"] + "matlab -nojvm -nosplash -r \""
+                        runmat = param["matlabPath"] + "matlab -wait -nojvm -nosplash -r \""
                     else:
-                        runmat = "matlab -nojvm -nosplash -r \""
+                        runmat = "matlab -wait -nojvm -nosplash -r \""
                     path1 = "addpath(\'" + param["jobsRep"][i] + "\');"
                     path2 = "addpath(\'" + param["repTools"] + "\');"
                     fct1 = updateTasksDone + ";"
@@ -158,12 +158,7 @@ class dataPreprocessing():
                     cmd = subprocess.Popen(matlabCmd, shell=True)  # display matlab messages on shell
                     stdoutdata, stderrdata = cmd.communicate()
                     
-                    #compatibility for windows
-                    import sys
-                    if sys.platform == "win32":
-                        print("Please wait until the Matlab script is finished, then press any key to continue")
-                        import os
-                        os.system('pause') 
+
             else:
                 print "\n-------------------- \ndataset:", dataset, "not processed"
         textFile = open(param["tempFileName"], "a")
