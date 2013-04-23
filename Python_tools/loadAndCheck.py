@@ -159,6 +159,8 @@ def checkFolderTree(examRep):
     msg = list()
     
     for fold in examRep:
+        if sys.platform == "win32":
+            fold = fold.replace('\\','/')
         fList = fold[0:-1].split("/")
         err = "ok"
         if len(fList) < 3:

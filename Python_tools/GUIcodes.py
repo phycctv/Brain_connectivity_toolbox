@@ -660,7 +660,7 @@ class mainWindow(Tk):
                 self.examList.insert(0, t)
                 list2listbox(self.c1dir, self.examList)
         elif case == "root":
-            self.rootRep.set(tkFileDialog.askdirectory(parent=self.master, initialdir="~/", title='Please select a directory'))
+            self.rootRep.set(tkFileDialog.askdirectory(parent=self.master, initialdir="~/Documents/", title='Please select a directory'))
             self.updateListbox("root")
         else:
             WinChooseRep(self, case)
@@ -695,7 +695,7 @@ class mainWindow(Tk):
             content = glob.glob(self.rootRep.get() + "/*")
             for i in content:
                 if os.path.isdir(i) is True:
-                    self.pathoList.append(i)
+                    self.pathoList.append(i.replace('\\','/'))
         elif case == "patient":
             del self.patientList
             self.patientList = list()
@@ -703,7 +703,7 @@ class mainWindow(Tk):
                 content = glob.glob(f + "/*")
                 for i in content:
                     if os.path.isdir(i) is True:
-                        self.patientList.append(i)
+                        self.patientList.append(i.replace('\\','/'))
         elif case == "exam":
             del self.examList
             self.examList = list()
@@ -711,7 +711,7 @@ class mainWindow(Tk):
                 content = glob.glob(f + "/Original/*")
                 for i in content:
                     if os.path.isdir(i) is True:
-                        self.examList.append(i)
+                        self.examList.append(i.replace('\\','/'))
         self.updateListbox(case)
 
     def ClearList(self, case):
@@ -897,9 +897,14 @@ class WinChooseRep(Toplevel):
             for i, f in enumerate(self.master.pathoList):
                 self.parent.insert(i, f)
         elif self.case == "exam":
+            # Show only rep exist
             for i, f in enumerate(self.master.patientList):
-                self.parent.insert(i, f + "/Original")
-        
+                if os.path.isdir(f + "/Original/") is True:
+                    if sys.platform == "win32":
+                        self.parent.insert(i, f.replace('\\','/') + "/Original")
+                    else:
+                        self.parent.insert(i, f + "/Original")
+
         self.initialize(master)
 
     def initialize(self, master):

@@ -5,6 +5,7 @@
 # Latest update :           10/10/2012
 
 from time import strftime
+import sys
 
 # # ---------------------------------------- ##
 class allFunctions():
@@ -88,7 +89,9 @@ class dataPreprocessing():
                 if len(param["runPreprocess"][i]) > 0:
                     
                     # creates new folders
-                    if dataset[-1] != "/":
+                    if sys.platform == "win32":
+                        dataset = dataset.replace('\\','/')
+                    if dataset[-1] != "/":                        
                         dataset = dataset + "/"
                     rep = dataset.split("/")
                     patientDir = ("/").join(rep[0:-3])
