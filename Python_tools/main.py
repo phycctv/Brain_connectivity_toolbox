@@ -138,12 +138,16 @@ if "process" in param :
 
 
     # -------------------------- END ------------------------------------------ #
-
+    
     print "End -", strftime("%H:%M")
 
     textFile = open(param["tempFileName"], "a")
     textFile.write("\nEnd - " + strftime("%H:%M"))
     textFile.close()
+    import os
+    os.system('pause')
+    exit(0)
+    
 else:
     print "Window closed by user, programme exit(0)"
     exit(0)

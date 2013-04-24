@@ -45,14 +45,16 @@ def settings():
     param["mode"] = "graph"
     param["option"] = "indep"
     sourcePath = os.path.split(os.path.realpath(__file__))[0]
+    if sys.platform == "win32":
+        sourcePath = sourcePath.replace('\\','/')
     print "Source workspace : " + sourcePath
     param["matlabPath"] = "/soft/matlab/R2011b/bin/"
     if sys.platform == "win32" :
         param["matlabPath"] = "H:/matlab2012/bin/"
-    param["repSPM"] = os.path.realpath(sourcePath +"/../../spm8/")
-    param["repTools"] = os.path.realpath(sourcePath +"/../Matlab_tools/preproc_SPM8/")
-    param["repR"] = os.path.realpath(sourcePath +"/../R_tools/")
-    param["paramFile"] = os.path.realpath(sourcePath +"/paramfile.txt")
+    param["repSPM"] = os.path.realpath(sourcePath +"/../../spm8/").replace('\\','/')
+    param["repTools"] = os.path.realpath(sourcePath +"/../Matlab_tools/preproc_SPM8/").replace('\\','/')
+    param["repR"] = os.path.realpath(sourcePath +"/../R_tools/").replace('\\','/')
+    param["paramFile"] = os.path.realpath(sourcePath +"/paramfile.txt").replace('\\','/')
 
     
     # check values for mandatory variables

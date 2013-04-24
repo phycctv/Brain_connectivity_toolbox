@@ -6,6 +6,7 @@
 
 from time import strftime
 import sys
+import os
 
 # # ---------------------------------------- ##
 class allFunctions():
@@ -310,8 +311,10 @@ class graphComputing():
             import sys
             if sys.platform == "win32":
                 import os
-
-                os.mkdir( self.resultRep[i] + "/Graph_Measures/")
+                try:
+                    os.mkdir( self.resultRep[i] + "/Graph_Measures/")
+                except WindowsError:
+                    print'/Graph_Measures/ exist.'
             r.compute_MST(self.repR, self.resultRep[i], self.nbReg)
             
     def DoGraphs(self, i):

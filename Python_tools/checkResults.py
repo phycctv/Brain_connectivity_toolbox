@@ -476,7 +476,7 @@ class WinVolShow(Tk):
         self.posx.set(self.slicex.get())
         self.posy.set(self.slicey.get())
         self.posz.set(self.slicez.get())
-        self.showSlices()
+        self.showSlices()##???
 
     def showSlices(self):
         """ Data loading from files, processing and displaying in window.
@@ -545,7 +545,7 @@ class WinVolShow(Tk):
 
             # slices extraction from volume
             self.ImXY[:, :, i] = dataNorm[:, :, self.posz.get()]
-            self.ImYZ[:, :, i] = dataNorm[self.posx.get(), :, :]
+            self.ImYZ[:, :, i] = dataNorm[self.posx.get(), :, :]##???
             self.ImXZ[:, :, i] = dataNorm[:, self.posy.get(), :]
 
         # show images
