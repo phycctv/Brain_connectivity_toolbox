@@ -145,7 +145,9 @@ if "process" in param :
     textFile.write("\nEnd - " + strftime("%H:%M"))
     textFile.close()
     import os
-    os.system('pause')
+    import sys
+    if sys.platform == "win32":
+        os.system('pause')
     exit(0)
     
 else:
