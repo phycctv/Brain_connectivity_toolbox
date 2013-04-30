@@ -48,9 +48,22 @@ def settings():
     if sys.platform == "win32":
         sourcePath = sourcePath.replace('\\','/')
     print "Source workspace : " + sourcePath
-    param["matlabPath"] = "/soft/matlab/R2011b/bin/"
-    if sys.platform == "win32" :
-        param["matlabPath"] = "H:/matlab2012/bin/"
+    try:
+        configFile = open(param["Config"], "r")
+    except Exception,data:
+        print data , " file not found, searching MATLAB(please select the directory of MATLAB) "
+        
+    if not sys.platform == "win32" :
+        import subprocess
+        p = subprocess.Popen('which matlab', shell=True, stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
+        for line in p.stdout.readlines():
+            print line,
+        retval = p.wait()
+        matlabPath = line.strip().split("/")
+        param["matlabPath"]="/"
+        for p in matlabPath[0:-2]:
+            param["matlabPath"]= param["matlabPath"]+p+"/"
+            
     param["repSPM"] = os.path.realpath(sourcePath +"/../../spm8/").replace('\\','/')
     param["repTools"] = os.path.realpath(sourcePath +"/../Matlab_tools/preproc_SPM8/").replace('\\','/')
     param["repR"] = os.path.realpath(sourcePath +"/../R_tools/").replace('\\','/')

@@ -99,8 +99,8 @@ def loadParameter(param):
 def setMode(param):
     """ set the "mode" of param "graph" or "script", choice to use GUI or to load parameter file
         Return param."""
-    mode = raw_input("Please choice to use GUI or to load parameter file\n 1.Input \"script\" to use console mode.\n 2.Press Enter to use a graphical interface \n ->")
-    if mode == "script":
+    mode = raw_input("Please choice to use GUI or to load parameter file\n 1.Input \"script\" or \"s\" to use console mode.\n 2.Press Enter to use a graphical interface \n ->")
+    if mode == "script" or mode == "s":
         param["mode"] = "script"
         print"Mode script:\n"
     else:

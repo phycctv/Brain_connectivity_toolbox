@@ -180,8 +180,12 @@ class mainWindow(Tk):
         """ Class constructor """ 
         Tk.__init__(self, master)
         scnWidth,scnHeight = self.maxsize() # get screen width and height
-        width = 710
-        height = 800
+        if sys.platform == "win32":
+            width = 710
+            height = 800
+        else:
+            width = 820
+            height = 800
         if scnWidth<width:
             width = scnWidth-60
         if scnHeight<height:
