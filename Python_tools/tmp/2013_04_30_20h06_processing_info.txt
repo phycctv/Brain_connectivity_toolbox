@@ -1,0 +1,49 @@
+Tuesday 30 April 2013 20:06
+
+Parameters set with GUI.
+Functional fMRI data processed.
+Overwrite existing files: n
+
+Chosen functions:
+	data preprocessing
+	quality check
+	time series extraction
+	graph computing
+
+Data folders:
+1. /home/zhang/Documents/toolbox_connectivty/Original/Exam0
+
+Overwrite existing files: n
+
+Chosen SPM functions - reference file in SPM:
+	realign	-	 
+	segment	-	/home/zhang/workspace/spm8/toolbox/Seg/TPM.nii 
+	normalize	-	/home/zhang/workspace/spm8/toolbox/AtlasMNI/TemGraph1_1.5.img /home/zhang/workspace/spm8/toolbox/AtlasMNI/TemGraph2_1.5.img /home/zhang/workspace/spm8/toolbox/AtlasMNI/TemGraph3_1.5.img /home/zhang/workspace/spm8/toolbox/AtlasMNI/TemGraph4_1.5.img /home/zhang/workspace/spm8/toolbox/AtlasMNI/TemGraph5_1.5.img /home/zhang/workspace/spm8/toolbox/AtlasMNI/TemGraph6_1.5.img 
+	warp	-	 
+	iwarp	-	/home/zhang/workspace/spm8/toolbox/AtlasMNI/ROI_MNI_V4.nii 
+	coregister	-	/home/zhang/workspace/spm8/toolbox/AtlasMNI/ROI_MNI_V4.nii 
+	coregister_interp	-	 
+	iwarp_finergrid	-	/home/zhang/workspace/spm8/toolbox/Atlas/Template.nii 
+	coregister_finergrid	-	/home/zhang/workspace/spm8/toolbox/Atlas/Template.nii 
+
+Functions status:
+	- realign	run
+	- segment	run
+	- normalize	run
+	- warp	run
+	- iwarp	run
+	- coregister	run
+	- coregister_interp	run
+	- iwarp_finergrid	run
+	- coregister_finergrid	run
+
+Preprocessing for data in /home/zhang/Documents/toolbox_connectivty/Original/Exam0/
+	-> matlab script: /home/zhang/Documents/toolbox_connectivty/Processed/Exam0/Jobs/preprocessing_2013_04_30_20h06.m.
+
+Preprocessing done - 20:07:13
+Quality check done - 20:07:16
+	next step for data sets:
+Time series extraction done - 20:07:17
+Graph computing done - 20:07:17
+
+End - 20:07
