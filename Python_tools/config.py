@@ -63,14 +63,17 @@ def settings():
                     print matPath+"matlab is not a file"
         configFile.close()
         if find is not True:
-            print("Can't find Matlab path in file Config.txt")
+            print "Can't find Matlab path in file Config.txt"
             print "Searching MATLAB "
-            param["matlabPath"]=searchMatlab()
-        
+            matlabPath=searchMatlab()
+            if matlabPath is not None:
+                param["matlabPath"] = matlabPath
+                
     except Exception,name:
-        print name , " searching MATLAB "
-        param["matlabPath"]=searchMatlab()
-            
+        matlabPath=searchMatlab()
+        if matlabPath is not None:
+            param["matlabPath"] = matlabPath
+
     param["repSPM"] = os.path.realpath(sourcePath +"/../../spm8/").replace('\\','/')
     param["repTools"] = os.path.realpath(sourcePath +"/../Matlab_tools/preproc_SPM8/").replace('\\','/')
     param["repR"] = os.path.realpath(sourcePath +"/../R_tools/").replace('\\','/')
@@ -98,34 +101,44 @@ def settings():
 # ---------------------------------------------------- #
 
 def searchMatlab():
-    if not sys.platform == "win32" :
-        import subprocess
-        p = subprocess.Popen("which matlab", shell=True, stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
-        for line in p.stdout.readlines():
-            None
-            #print line #to display the result
-        retval = p.wait()
-        if " no " not in line:
-            matlabPath0 = line.strip().split("/")
-            matlabPath=""
-            for p in matlabPath0[0:-1]:
-                matlabPath= matlabPath+p+"/"
-        else:
-            p = subprocess.Popen(["/bin/bash","-i","-c","alias matlab"],stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
+    import subprocess
+    f = False
+    p = subprocess.Popen("matlab -wait -h", shell=True, stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
+    for line in p.stdout.readlines():
+        if " MATLAB " in line:
+            f = True
+    if f is True:
+        if not sys.platform == "win32" :
+            p = subprocess.Popen("which matlab", shell=True, stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
             for line in p.stdout.readlines():
-                #None
-                print line #to display the result
-            p.communicate()
-            if " not " not in line:
-                matlabPath0 = line.strip().split("'")
-                matlabPath=matlabPath0[1][0:-6]
+                None
+                #print line #to display the result
+            retval = p.wait()
+            if "/matlab" in line:
+                matlabPath0 = line.strip().split("/")
+                matlabPath=""
+                for p in matlabPath0[0:-1]:
+                    matlabPath= matlabPath+p+"/"
             else:
-                print "can't find matlab(please select the directory of MATLAB)"
-                ############################# ? completer ###############################################
-        configFile = open("Config.txt", "w")
-        configFile.write("matlabPath:"+matlabPath+"\n")
-        configFile.close()
-        print("---Matlab found--- \n OK")
+                p = subprocess.Popen(["/bin/bash","-i","-c","alias matlab"],stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
+                for line in p.stdout.readlines():
+                    #None
+                    print line #to display the result
+                p.communicate()
+                if "=" in line:
+                    matlabPath0 = line.strip().split("'")
+                    matlabPath=matlabPath0[1][0:-6]
+            configFile = open("Config.txt", "w")
+            configFile.write("matlabPath:"+matlabPath+"\n")
+            configFile.close()
+            print("---Matlab found--- \n OK")
+            #print line #to display the result
+        else:
+            matlabPath=None
+            print("---Matlab found--- \n OK")
+    else:
+        print "can't find matlab(please select the directory of MATLAB)"
+                    ############################# ? completer ###############################################
     return matlabPath
 # ---------------------------------------------------- #
 def reinitializeSettings(param):
