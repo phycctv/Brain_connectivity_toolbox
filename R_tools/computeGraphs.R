@@ -300,7 +300,7 @@ read_results <- function(Rpath,path,n.regions){
 	
 	Sujet <- ""
 	
-	coord<-paste(Rpath,'coord1.tt',sep='/')
+	coord<-paste(Rpath,'coord1.tt',sep='/')# a corriger
 	
 	set1 <- read.table(coord, header=TRUE)
 	

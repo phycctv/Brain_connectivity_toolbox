@@ -6,10 +6,13 @@
 ################################################################
 
 # first version : 30/08/2012
-# last update 	: 10/10/2012
+# last update 	: 12/10/2012
 # from computeThresholdPenalizedEffControls_MST_Vaude.R
 # from read_results_patients_Vaude.R
 # from plot_mvt.R
+# note: this version works with package igraph, version before 0.6
+# if your version is older than 0.6, use package igraph0
+
 
 compute_MST <- function(Rpath,path,n.regions){
 # from computeThresholdPenalizedEffControls_MST_Vaude.R
@@ -22,7 +25,11 @@ compute_MST <- function(Rpath,path,n.regions){
 	graphs<-TRUE
 	
 	library('brainwaver')
+	
+######### modif: igraph or igrahp0
 	library('igraph0')
+	#library('igraph')
+#########
 	library('methods')###############################################
 	
 	name.dir<-paste(path,'Graph_Measures/',sep='/')
@@ -276,7 +283,10 @@ read_results <- function(Rpath,path,n.regions){
 # from read_results_patients_Vaude.R
 	
 	library(Cairo)
+######### modif: igraph or igrahp0
 	library('igraph0')
+	#library('igraph')
+#########
 	library('methods')###############################################
 	
 	source(paste(Rpath,'parameters.R',sep='/'))
@@ -419,8 +429,8 @@ plot_mvt <- function(Rpath,path){
 	pdf(paste(path,'/Graph_Measures/mvt_zoom_',Sujet,ref,'.pdf',sep=''))
 	par(mfrow=c(2,1))	
 	
-	path.mov<-list.files(path=paste(path,'Functional/realigned/',sep='/'),pattern=glob2rx("rp*.txt"))
-	mvt <- read.table(paste(path,'Functional/realigned/',path.mov,sep='/'), header=FALSE)
+	path.mov<-list.files(path=paste(path,'Functional/Realigned/',sep='/'),pattern=glob2rx("rp*.txt"))
+	mvt <- read.table(paste(path,'Functional/Realigned/',path.mov,sep='/'), header=FALSE)
 	
 	ymin<-min(mvt[,1:3])-0.05
 	ymax<-max(mvt[,1:3])+0.05
