@@ -49,9 +49,21 @@ def settings():
         sourcePath = sourcePath.replace('\\','/')
     print "Source workspace : " + sourcePath
     try:
-        configFile = open(param["Config"], "r")
-    except Exception,data:
-        print data , " file not found, searching MATLAB(please select the directory of MATLAB) "
+        configFile = open(param["Config.txt"], "r")
+        ############################# ? completer ###############################################
+        data = configFile.readlines()
+        find = False
+        for line in data:
+            if "matlabPath:" in line:
+                param["matlabPath"] = line.split(":")[1]
+                find = True
+        if find is not True:
+            print("Can't find Matlab path in file Config.txt")
+            param0 = searchMatlab()
+            param["matlabPath"]=param0["matlabPath"]
+        configFile.close()
+    except Exception,name:
+        print name , " file not found, searching MATLAB "
         if not sys.platform == "win32" :
             import subprocess
             p = subprocess.Popen("which matlab", shell=True, stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
@@ -74,7 +86,11 @@ def settings():
                     matlabPath = line.strip().split("'")
                     param["matlabPath"]=matlabPath[1][0:-6]
                 else:
-                    print "can't find matlab"
+                    print "can't find matlab(please select the directory of MATLAB)"
+                    ############################# ? completer ###############################################
+            configFile = open(param["Config.txt"], "a")
+            configFile.write("matlabPath:",param["matlabPath"],"\n")
+            textFile.close()
 
             
     param["repSPM"] = os.path.realpath(sourcePath +"/../../spm8/").replace('\\','/')
@@ -101,7 +117,37 @@ def settings():
     
 
     return param
+# ---------------------------------------------------- #
 
+def searchMatlab():
+    if not sys.platform == "win32" :
+        import subprocess
+        p = subprocess.Popen("which matlab", shell=True, stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
+        for line in p.stdout.readlines():
+            None
+            #print line #to display the result
+        retval = p.wait()
+        if " no " not in line:
+            matlabPath = line.strip().split("/")
+            param["matlabPath"]=""
+            for p in matlabPath[0:-1]:
+                param["matlabPath"]= param["matlabPath"]+p+"/"
+        else:
+            p = subprocess.Popen(["/bin/bash","-i","-c","alias matlab"],stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
+            for line in p.stdout.readlines():
+                #None
+                print line #to display the result
+            p.communicate()
+            if " not " not in line:
+                matlabPath = line.strip().split("'")
+                param["matlabPath"]=matlabPath[1][0:-6]
+            else:
+                print "can't find matlab(please select the directory of MATLAB)"
+                ############################# ? completer ###############################################
+        configFile = open(param["Config.txt"], "a")
+        configFile.write("matlabPath:",param["matlabPath"],"\n")
+        textFile.close()
+    return param
 # ---------------------------------------------------- #
 def reinitializeSettings(param):
     """ Set default values for parameters settings defined in function settings."""
