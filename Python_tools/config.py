@@ -112,6 +112,7 @@ def searchMatlab():
     if not sys.platform == "win32" or f is True:
         if not sys.platform == "win32" :
             p = subprocess.Popen("which matlab", shell=True, stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
+            line = ""
             for line in p.stdout.readlines():
                 None
                 #print line #to display the result
