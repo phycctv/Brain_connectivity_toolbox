@@ -60,7 +60,7 @@ def settings():
                     param["matlabPath"]=matPath
                     find = True
                 else:
-                    print matPath+"matlab is not a file"
+                    print matPath[0:-1]+"matlab is not a file"
         configFile.close()
         if find is not True:
             print "Can't find Matlab path in file Config.txt"
@@ -103,11 +103,13 @@ def settings():
 def searchMatlab():
     import subprocess
     f = False
-    p = subprocess.Popen("matlab -wait -h", shell=True, stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
-    for line in p.stdout.readlines():
-        if " MATLAB " in line:
-            f = True
-    if f is True:
+    if sys.platform == "win32" :
+        p = subprocess.Popen("matlab -wait -h", shell=True, stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
+        for line in p.stdout.readlines():
+            if " MATLAB " in line:
+                f = True
+        p.communicate()
+    if not sys.platform == "win32" or f is True:
         if not sys.platform == "win32" :
             p = subprocess.Popen("which matlab", shell=True, stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
             for line in p.stdout.readlines():
@@ -115,6 +117,7 @@ def searchMatlab():
                 #print line #to display the result
             retval = p.wait()
             if "/matlab" in line:
+                f=True
                 matlabPath0 = line.strip().split("/")
                 matlabPath=""
                 for p in matlabPath0[0:-1]:
@@ -126,18 +129,24 @@ def searchMatlab():
                     print line #to display the result
                 p.communicate()
                 if "=" in line:
+                    f=True
                     matlabPath0 = line.strip().split("'")
                     matlabPath=matlabPath0[1][0:-6]
-            configFile = open("Config.txt", "w")
-            configFile.write("matlabPath:"+matlabPath+"\n")
-            configFile.close()
-            print("---Matlab found--- \n OK")
-            #print line #to display the result
+            if f is True:
+                configFile = open("Config.txt", "w")
+                configFile.write("matlabPath:"+matlabPath+"\n")
+                configFile.close()
+                print("---Matlab found--- \n OK")
+            else:
+                print "can't find matlab(please select the directory of MATLAB)"
+                matlabPath=None
+                ############################# ? completer ###############################################
         else:
             matlabPath=None
             print("---Matlab found--- \n OK")
     else:
         print "can't find matlab(please select the directory of MATLAB)"
+        matlabPath=None
                     ############################# ? completer ###############################################
     return matlabPath
 # ---------------------------------------------------- #
