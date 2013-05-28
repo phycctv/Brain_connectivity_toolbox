@@ -50,14 +50,13 @@ def settings():
     print "Source workspace : " + sourcePath
     try:
         configFile = open("Config.txt", "r")
-        ############################# ? completer ###############################################
         lines = configFile.readlines()
         find = False
         for line in lines:
             if "matlabPath:" in line:
                 matPath = line.split(":")[1]
                 if os.path.isfile(matPath[0:-1]+"matlab"):
-                    param["matlabPath"]=matPath
+                    param["matlabPath"]=matPath[0:-1]
                     find = True
                 else:
                     print matPath[0:-1]+"matlab is not a file"
@@ -101,21 +100,27 @@ def settings():
 # ---------------------------------------------------- #
 
 def searchMatlab():
+    """Search the directory of installed MATLAB"""
+    print "Searching the directory of MATLAB..."   
     import subprocess
     f = False
-    if sys.platform == "win32" :
+    if sys.platform == "win32" : #For Windows
         p = subprocess.Popen("matlab -wait -h", shell=True, stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
         for line in p.stdout.readlines():
             if " MATLAB " in line:
                 f = True
         p.communicate()
     if not sys.platform == "win32" or f is True:
-        if not sys.platform == "win32" :
+        if not sys.platform == "win32" : #For Linux/Mac
+            #Search in the $PATH
+            print "Searching in the $PATH"
             p = subprocess.Popen("which matlab", shell=True, stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
             line = ""
             for line in p.stdout.readlines():
-                None
-                #print line #to display the result
+            #*************************************#
+                None # Go to the last line of ouput
+                #print line #to display ouput
+            #*************************************#
             retval = p.wait()
             if "/matlab" in line:
                 f=True
@@ -123,32 +128,40 @@ def searchMatlab():
                 matlabPath=""
                 for p in matlabPath0[0:-1]:
                     matlabPath= matlabPath+p+"/"
-            else:
+                    
+                    
+            #If matlab does not exist in the #PATH, search from alias
+            else: 
+                print "Can't find in the #PATH, Searching alias"
                 p = subprocess.Popen(["/bin/bash","-i","-c","alias matlab"],stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
                 for line in p.stdout.readlines():
-                    #None
-                    print line #to display the result
+                #*************************************#
+                    None # Go to the last line of ouput
+                    #print line #to display ouput
+                #*************************************#
                 p.communicate()
                 if "=" in line:
                     f=True
                     matlabPath0 = line.strip().split("'")
                     matlabPath=matlabPath0[1][0:-6]
+                    
+            # If found matlab, save it in file "Config"
             if f is True:
                 configFile = open("Config.txt", "w")
                 configFile.write("matlabPath:"+matlabPath+"\n")
                 configFile.close()
                 print("---Matlab found--- \n OK")
             else:
-                print "can't find matlab(please select the directory of MATLAB)"
+                print "Can't find matlab(please select the directory of MATLAB if you need data preprocessing)"
                 matlabPath=None
                 ############################# ? completer ###############################################
         else:
             matlabPath=None
             print("---Matlab found--- \n OK")
     else:
-        print "can't find matlab(please select the directory of MATLAB)"
+        print "Can't find matlab(please select the directory of MATLAB if you need data preprocessing)"
         matlabPath=None
-                    ############################# ? completer ###############################################
+        ############################# ? completer ###############################################
     return matlabPath
 # ---------------------------------------------------- #
 def reinitializeSettings(param):

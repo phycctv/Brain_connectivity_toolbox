@@ -59,10 +59,12 @@ def loadParameter(param):
             # case choice
             app = caseWindow(None, param)
             app.title("~ Case ~")
+            app.focus_force()
             app.mainloop()
     
             # other parameters
             app = mainWindow(None, param)
+            app.focus_force()
             app.mainloop()
     
         elif param["mode"] == "script":

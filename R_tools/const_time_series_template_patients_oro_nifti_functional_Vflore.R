@@ -9,18 +9,22 @@ extractTS <- function(Rpath,path0,path1,templBaseName){
 	# only template templBaseName
 	
 	# Original AAL
-	location<-read.table(paste(Rpath,paste(c(templBaseName),'txt',sep='.'),sep='/'),header=FALSE)   
-	n.regions<-dim(location)[1]			
-	noms <- location[,2]
-	location<-location[,3]
+	#location<-read.table(paste(Rpath,paste(c(templBaseName),'txt',sep='.'),sep='/'),header=FALSE)
+	#n.regions<-dim(location)[1]
+	#noms <- location[,2]
+	#location<-location[,3]
 	name.long.temp<-paste('natw',templBaseName,sep="")
-	name.ts<-'func_ROI'
+	name.ts<-paste('func_ROI',templBaseName,sep="")
 	
 
 	# only one patient
 
 	name.temp<-list.files(path=paste(path1,'Anat/Atlased/',sep='/'),pattern=glob2rx(paste(name.long.temp,"*.nii",sep='')))
 	vol.template<-readNIfTI(paste(path1,'Anat/Atlased/',name.temp,sep='/'),reorient=F)
+    location<-unique(as.vector(vol.template))
+    location<-location[location!=0]
+    n.regions<-length(location)
+    
 	name.grey.matter<-list.files(path=paste(path1,'Anat/Segmented/',sep='/'),pattern=glob2rx("rc1*.nii"))
 	vol.grey.matter<-readNIfTI(paste(path1,'Anat/Segmented/',name.grey.matter,sep='/'),reorient=F)
 
@@ -36,11 +40,11 @@ extractTS <- function(Rpath,path0,path1,templBaseName){
 
 		name.txt<-paste(paste(path1,'Functional/data/',sep='/'),name.ts,'_voxels_time_series_region_',i,'.txt',sep='')
 
-		write.table(paste("Time series of each voxel for region",i,' ',noms[i],sep=''),name.txt,quote=FALSE,col.names=FALSE,row.names=FALSE,eol=" ")
+		write.table(paste("Time series of each voxel for region",i,' ',sep=''),name.txt,quote=FALSE,col.names=FALSE,row.names=FALSE,eol=" ")
 		write.table(" ",name.txt,quote=FALSE,col.names=FALSE,row.names=FALSE,eol="\n",append=TRUE)
 		name.matter.txt<-paste(paste(path1,'Functional/grey_matter_data/',sep='/'),'grey_matter_',name.ts,'_voxels_time_series_region_',i,'.txt',sep='')
 
-		write.table(paste("Grey matter coefficients for region",i,' ',noms[i],sep=''),name.matter.txt,quote=FALSE,col.names=FALSE,row.names=FALSE,eol=" ")
+		write.table(paste("Grey matter coefficients for region",i,' ',sep=''),name.matter.txt,quote=FALSE,col.names=FALSE,row.names=FALSE,eol=" ")
 		write.table(" ",name.matter.txt,quote=FALSE,col.names=FALSE,row.names=FALSE,eol="\n",append=TRUE)
 
 		index<-which(vol.template==location[i],arr.ind=TRUE)

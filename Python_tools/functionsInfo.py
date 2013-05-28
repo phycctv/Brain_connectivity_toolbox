@@ -144,9 +144,9 @@ class dataPreprocessing():
            
                     # matlab command
                     if "matlabPath" in param:
-                        runmat = param["matlabPath"] + "matlab -wait -nojvm -nosplash -r \""
+                        runmat = param["matlabPath"] + "matlab -wait -nodesktop -nosplash -r \""
                     else:
-                        runmat = "matlab -wait -nojvm -nosplash -r \""
+                        runmat = "matlab -wait -nodesktop -nosplash -r \""
                     path1 = "addpath(\'" + param["jobsRep"][i] + "\');"
                     path2 = "addpath(\'" + param["repTools"] + "\');"
                     fct1 = updateTasksDone + ";"
@@ -200,7 +200,8 @@ class TSExtraction():
         self.name2 = "timeseriesextraction"
         self.case = "functional"
         self.nb = 2
-        self.templBaseName = "ROI_MNI_V4"
+        #self.templBaseName = "ROI_MNI_V4"
+        self.tempBaseNames = list()
         
         if "tempFileName" in param:
             self.tmpfile = param["tempFileName"]
@@ -239,14 +240,19 @@ class TSExtraction():
         import glob
 
         print "\n=========== TIME SERIES ============================================================="       
-        for i, dataset in enumerate(self.dataset):            
-
+        for i, dataset in enumerate(self.dataset):   
+            self.tempBaseNames = glob.glob(dataset.replace("Original", "Processed") + "/Anat/Atlased/natw*.nii")
             if self.todo[i]:
                 print "\n-------------------- \ndataset:", dataset, ": time series extraction"
                 self.setFolders(i)
-                r = robjects.r
-                r.source(self.repR + "/const_time_series_template_patients_oro_nifti_functional_Vflore.R")
-                r.extractTS(self.repR, dataset, self.resultRep[i], self.templBaseName)
+                for templBaseName in self.tempBaseNames:
+                    if sys.platform == "win32":
+                        templBaseName = templBaseName.replace('\\','/')
+                    templBaseName = templBaseName.split("/")[-1].split("_u_rc")[0].replace("natw","")
+                    print "For template : " + templBaseName
+                    r = robjects.r
+                    r.source(self.repR + "/const_time_series_template_patients_oro_nifti_functional_Vflore.R")
+                    r.extractTS(self.repR, dataset, self.resultRep[i], templBaseName)
             else:
                 print "\n-------------------- \ndataset:", dataset, ": time series extraction not done"
 

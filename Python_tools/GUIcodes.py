@@ -37,7 +37,7 @@ class caseWindow(Tk):
         self.master = master
         self.param = param  
         self.initialize(master)
-
+        #self.wm_attributes('-topmost',1)
         """
         self.frame=Frame(self, relief=RAISED, bd=1)
         self.frame.pack(fill=BOTH, expand=1)
@@ -284,7 +284,7 @@ class mainWindow(Tk):
         scrx.grid(column=0, row=3, sticky='new')
         self.c1dir.config(xscrollcommand=scrx.set)
         # button Research        
-        self.c1Research = Button(fcase1, text=u"Research0", command=lambda case=" ":self.AddRep(case), anchor='w', state=self.case1.get())
+        self.c1Research = Button(fcase1, text=u"Research0", command=lambda case="one":self.AddRep(case), anchor='w', state=self.case1.get())
         self.c1Research.grid(column=1, row=2, sticky='sw')
 
         # ----- case 2 : several datasets ------------------------------------------------------------------
@@ -657,7 +657,7 @@ class mainWindow(Tk):
             Otherwise the new window is a WinChooseRep object.
             In all cases, the listbox corresponding to the case is updated with new folders list."""        
         if self.case.get() == "one":
-            t = tkFileDialog.askdirectory(parent=self.master, initialdir="~/Documents/toolbox_connectivty/Original/Exam0", title='Please select a directory')
+            t = tkFileDialog.askdirectory(parent=self.master, initialdir="~/Documents/NetBeansProjects/Original/Exam0", title='Please select a directory')
             if t != "":
                 del self.examList
                 self.examList = list()
@@ -1203,7 +1203,8 @@ Attributes:
             self.selFctList.append(p)
             
         self.initialize(master)
-        
+        self.focus_set()
+        self.grab_set()
     def initialize(self, master):
         """ Display window.
 
@@ -1406,7 +1407,8 @@ Warning : all changes done in reference files with this class are lost when user
         self.master = master
         self.templName = []
         self.initialize(master)
-        
+        self.focus_set()
+        self.grab_set()
     def initialize(self, master):
         """ Display window.
 
@@ -1473,7 +1475,10 @@ Warning : all changes done in reference files with this class are lost when user
         fileName = tkFileDialog.askopenfilenames(parent=self, initialdir=self.master.param["repSPM"], title='Please select file(s) for ' + f)      
         if (fileName != "") and (fileName != ()):
             print fileName
-            self.templName[i].set(list2text(fileName))
+            if sys.platform == "win32":
+                self.templName[i].set(fileName.replace(" ","\n")) # ¨¤ am¨¦liorer(quand il y a des espaces dans le nom de fichier)
+            else:
+                self.templName[i].set(list2text(fileName))
 
     def clickOK(self):
         """ Validation of reference files lists and window closing.
