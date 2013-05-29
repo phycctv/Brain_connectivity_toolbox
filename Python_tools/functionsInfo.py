@@ -201,7 +201,7 @@ class TSExtraction():
         self.case = "functional"
         self.nb = 2
         #self.templBaseName = "ROI_MNI_V4"
-        self.tempBaseNames = list()
+        self.templBaseNames = list()
         
         if "tempFileName" in param:
             self.tmpfile = param["tempFileName"]
@@ -228,31 +228,57 @@ class TSExtraction():
         from os import mkdir, path
         if path.exists(self.rep[i] + "corrected_data/") is False:
             mkdir(self.rep[i] + "corrected_data/")
+        for templBaseName in self.templBaseNames:
+            if sys.platform == "win32":
+                templBaseName = templBaseName.replace('\\','/')
+            templBaseName = templBaseName.split("/")[-1].split("_u_rc")[0].replace("natw","")
+            if path.exists(self.rep[i] + "corrected_data/" + templBaseName + "/") is False:
+                mkdir(self.rep[i] + "corrected_data/" + templBaseName + "/")
         if path.exists(self.rep[i] + "grey_matter_data/") is False:
             mkdir(self.rep[i] + "grey_matter_data/")
+        for templBaseName in self.templBaseNames:
+            if sys.platform == "win32":
+                templBaseName = templBaseName.replace('\\','/')
+            templBaseName = templBaseName.split("/")[-1].split("_u_rc")[0].replace("natw","")
+            if path.exists(self.rep[i] + "grey_matter_data/" + templBaseName + "/") is False:
+                mkdir(self.rep[i] + "grey_matter_data/" + templBaseName + "/")
         if path.exists(self.rep[i] + "index/") is False:
             mkdir(self.rep[i] + "index/")
+        for templBaseName in self.templBaseNames:
+            if sys.platform == "win32":
+                templBaseName = templBaseName.replace('\\','/')
+            templBaseName = templBaseName.split("/")[-1].split("_u_rc")[0].replace("natw","")
+            if path.exists(self.rep[i] + "index/" + templBaseName + "/") is False:
+                mkdir(self.rep[i] + "index/" + templBaseName + "/")
         if path.exists(self.rep[i] + "data/") is False:
             mkdir(self.rep[i] + "data/")
+        for templBaseName in self.templBaseNames:
+            if sys.platform == "win32":
+                templBaseName = templBaseName.replace('\\','/')
+            templBaseName = templBaseName.split("/")[-1].split("_u_rc")[0].replace("natw","")
+            if path.exists(self.rep[i] + "data/" + templBaseName + "/") is False:
+                mkdir(self.rep[i] + "data/" + templBaseName + "/")
 
     def run(self):
         import rpy2.robjects as robjects
         import glob
-
+        import os
         print "\n=========== TIME SERIES ============================================================="       
         for i, dataset in enumerate(self.dataset):   
-            self.tempBaseNames = glob.glob(dataset.replace("Original", "Processed") + "/Anat/Atlased/natw*.nii")
+            self.templBaseNames = glob.glob(dataset.replace("Original", "Processed") + "/Anat/Atlased/natw*.nii")
             if self.todo[i]:
                 print "\n-------------------- \ndataset:", dataset, ": time series extraction"
                 self.setFolders(i)
-                for templBaseName in self.tempBaseNames:
+                for templBaseName in self.templBaseNames:
                     if sys.platform == "win32":
                         templBaseName = templBaseName.replace('\\','/')
                     templBaseName = templBaseName.split("/")[-1].split("_u_rc")[0].replace("natw","")
-                    print "For template : " + templBaseName
-                    r = robjects.r
-                    r.source(self.repR + "/const_time_series_template_patients_oro_nifti_functional_Vflore.R")
-                    r.extractTS(self.repR, dataset, self.resultRep[i], templBaseName)
+                    if not os.path.isfile(self.rep[i] + "corrected_data/"+ templBaseName + "/func_ROI_" + templBaseName + "_ts.txt"):
+                        print self.rep[i] + "corrected_data/"+"func_ROI_" + templBaseName + "_ts.txt"
+                        print "For template : " + templBaseName + "..."
+                        r = robjects.r
+                        r.source(self.repR + "/const_time_series_template_patients_oro_nifti_functional_Vflore.R")
+                        r.extractTS(self.repR, dataset, self.resultRep[i], templBaseName)
             else:
                 print "\n-------------------- \ndataset:", dataset, ": time series extraction not done"
 
@@ -309,19 +335,28 @@ class graphComputing():
 
     def ComputeMeasure(self, i):
             import rpy2.robjects as robjects
+            from os import mkdir, path
+            import glob
             r = robjects.r
             print("***** Start compute measures")
-            r.source(self.repR + "/computeGraphs.R")
-
+            self.templBaseNames = glob.glob(self.resultRep[i] + "/Functional/corrected_data/*")
+            print self.templBaseNames
             #compatibility for windows
             import sys
-            if sys.platform == "win32":
-                import os
-                try:
-                    os.mkdir( self.resultRep[i] + "/Graph_Measures/")
-                except WindowsError:
-                    print'/Graph_Measures/ exist.'
-            r.compute_MST(self.repR, self.resultRep[i], self.nbReg)
+            import os
+            try:
+                os.mkdir( self.resultRep[i] + "/Graph_Measures/")
+            except WindowsError:
+                print'/Graph_Measures/ exist.'
+            for templBaseName in self.templBaseNames:
+                if sys.platform == "win32":
+                    templBaseName = templBaseName.replace('\\','/')
+                templBaseName = templBaseName.split("/")[-1].split("_u_rc")[0].replace("natw","")
+                if path.exists(self.resultRep[i] + "Graph_Measures/" + templBaseName + "/") is False:
+                    mkdir(self.resultRep[i] + "Graph_Measures/" + templBaseName + "/")
+                r.source(self.repR + "/computeGraphs.R")
+                r.compute_Graph(self.repR, self.resultRep[i],templBaseName,"coord1.tt",1,True)
+                
             
     def DoGraphs(self, i):
             import rpy2.robjects as robjects

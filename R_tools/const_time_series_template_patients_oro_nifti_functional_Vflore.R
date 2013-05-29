@@ -14,7 +14,7 @@ extractTS <- function(Rpath,path0,path1,templBaseName){
 	#noms <- location[,2]
 	#location<-location[,3]
 	name.long.temp<-paste('natw',templBaseName,sep="")
-	name.ts<-paste('func_ROI',templBaseName,sep="")
+	name.ts<-paste('func_ROI_',templBaseName,sep="")
 	
 
 	# only one patient
@@ -23,7 +23,7 @@ extractTS <- function(Rpath,path0,path1,templBaseName){
 	vol.template<-readNIfTI(paste(path1,'Anat/Atlased/',name.temp,sep='/'),reorient=F)
     location<-unique(as.vector(vol.template))
     location<-location[location!=0]
-    n.regions<-length(location)
+    n.regions<-length(location)			
     
 	name.grey.matter<-list.files(path=paste(path1,'Anat/Segmented/',sep='/'),pattern=glob2rx("rc1*.nii"))
 	vol.grey.matter<-readNIfTI(paste(path1,'Anat/Segmented/',name.grey.matter,sep='/'),reorient=F)
@@ -38,11 +38,11 @@ extractTS <- function(Rpath,path0,path1,templBaseName){
 
 	for(i in 1:n.regions){
 
-		name.txt<-paste(paste(path1,'Functional/data/',sep='/'),name.ts,'_voxels_time_series_region_',i,'.txt',sep='')
+		name.txt<-paste(paste(path1,'Functional/data',templBaseName,'',sep='/'),name.ts,'_voxels_time_series_region_',i,'.txt',sep='')
 
 		write.table(paste("Time series of each voxel for region",i,' ',sep=''),name.txt,quote=FALSE,col.names=FALSE,row.names=FALSE,eol=" ")
 		write.table(" ",name.txt,quote=FALSE,col.names=FALSE,row.names=FALSE,eol="\n",append=TRUE)
-		name.matter.txt<-paste(paste(path1,'Functional/grey_matter_data/',sep='/'),'grey_matter_',name.ts,'_voxels_time_series_region_',i,'.txt',sep='')
+		name.matter.txt<-paste(paste(path1,'Functional/grey_matter_data',templBaseName,'',sep='/'),'grey_matter_',name.ts,'_voxels_time_series_region_',i,'.txt',sep='')
 
 		write.table(paste("Grey matter coefficients for region",i,' ',sep=''),name.matter.txt,quote=FALSE,col.names=FALSE,row.names=FALSE,eol=" ")
 		write.table(" ",name.matter.txt,quote=FALSE,col.names=FALSE,row.names=FALSE,eol="\n",append=TRUE)
@@ -54,7 +54,7 @@ extractTS <- function(Rpath,path0,path1,templBaseName){
 		write.table(c(tmp),name.matter.txt,quote=FALSE,col.names=FALSE,row.names=FALSE,append=TRUE,eol=" ")
 		write.table(" ",name.matter.txt,quote=FALSE,col.names=FALSE,row.names=FALSE,eol="\n",append=TRUE)
 		
-		name.index.txt<-paste(paste(path1,'Functional/index/',sep='/'),'index_',name.ts,'_voxels_time_series_region_',i,'.txt',sep='')
+		name.index.txt<-paste(paste(path1,'Functional/index',templBaseName,'',sep='/'),'index_',name.ts,'_voxels_time_series_region_',i,'.txt',sep='')
 		
 		write.table(paste("Voxels coordinates for region",i,sep=''),name.index.txt,quote=FALSE,col.names=FALSE,row.names=FALSE,eol=" ")
 		write.table(" ",name.index.txt,quote=FALSE,col.names=FALSE,row.names=FALSE,eol="\n",append=TRUE)
@@ -78,7 +78,7 @@ extractTS <- function(Rpath,path0,path1,templBaseName){
 			index<-which(vol.template==location[j],arr.ind=TRUE)
 			size.r<-dim(index)[1]
 
-			name.txt<-paste(paste(path1,'Functional/data/',sep='/'),name.ts,'_voxels_time_series_region_',j,'.txt',sep='')
+			name.txt<-paste(paste(path1,'Functional/data',templBaseName,'',sep='/'),name.ts,'_voxels_time_series_region_',j,'.txt',sep='')
 
 			# TS for each voxel of each region
  				write.table(c(i,vol[index]),name.txt,quote=FALSE,col.names=FALSE,row.names=FALSE,append=TRUE,eol=" ")
@@ -91,12 +91,12 @@ extractTS <- function(Rpath,path0,path1,templBaseName){
 
 	for(i in 1:n.regions){	# loop on regions
 
-		name.txt<-paste(paste(path1,'Functional/data/',sep='/'),name.ts,'_voxels_time_series_region_',i,'.txt',sep='')
+		name.txt<-paste(paste(path1,'Functional/data',templBaseName,'',sep='/'),name.ts,'_voxels_time_series_region_',i,'.txt',sep='')
 		tmp<-read.table(name.txt,header=FALSE,skip=1)
 		data<-as.matrix(tmp)[,-1]
 		nb.voxels<-dim(data)[2]
 
-		name.grey.matter<-paste(paste(path1,'Functional/grey_matter_data/',sep='/'),'grey_matter_',name.ts,'_voxels_time_series_region_',i,'.txt',sep='')
+		name.grey.matter<-paste(paste(path1,'Functional/grey_matter_data',templBaseName,'',sep='/'),'grey_matter_',name.ts,'_voxels_time_series_region_',i,'.txt',sep='')
 
 		coef.grey.matter<-read.table(name.grey.matter,header=FALSE,skip=1)
 		
@@ -133,7 +133,7 @@ extractTS <- function(Rpath,path0,path1,templBaseName){
 
 	data.correct<-set4
 
-	write.table(data.correct,paste(path1,'/Functional/corrected_data/',name.ts,'_ts.txt',sep=''),col.names=FALSE,row.names=FALSE,quote=FALSE)
+	write.table(data.correct,paste(path1,'/Functional/corrected_data/',templBaseName,'/'	,name.ts,'_ts.txt',sep=''),col.names=FALSE,row.names=FALSE,quote=FALSE)
 	
 	
 }

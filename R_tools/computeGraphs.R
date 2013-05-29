@@ -14,45 +14,48 @@
 # if your version is older than 0.6, use package igraph0
 
 
-compute_MST <- function(Rpath,path,n.regions){
-# from computeThresholdPenalizedEffControls_MST_Vaude.R
+#compute_Graph("/home/cindy/Bureau/","/home/cindy/Bureau/celiaOFF/celia090212withCSF/",78,"celia.090212.r01.withCSF_AllROIs","file_coord.txt")
+
+compute_Graph <- function(Rpath,path,templBaseName,file_coord,compute.cor,graphs)# path endroit ou il ya les fichiers, Rpath endroit ou il y a les fichiers fonction de R
+{
+    serie_temp<-paste('func_ROI_',templBaseName,'_ts.txt',sep='')
+	data.roi<-read.table(paste(path,'Functional/corrected_data',templBaseName,serie_temp,sep='/'))
+	proc.length<-dim(data.roi)[1]
+	n.regions<-dim(data.roi)[2]-1 # /!\ a changer selon le nb de regions souhaitees
+	cat("nb_pt_tps ", proc.length, " nb_regions ", n.regions,"\n")
+
+	source(paste(Rpath,'parameters.R',sep='/')) # utilise les param du fichiers param
+	source(paste(Rpath,'evaluate_knn.R',sep='/')) # appel de la fonction
 	
-	source(paste(Rpath,'parameters.R',sep='/'))
-	source(paste(Rpath,'evaluate_knn.R',sep='/'))
+	#compute.cor<-0 # calcul des mat de correlation mettre a 0 pour ne pas calculer
 	
-	compute.cor<-1
-	
-	graphs<-TRUE
+	#graphs<-TRUE # calcul des graphs, FALSE pr ne pas faire tourner
 	
 	library('brainwaver')
 	
 ######### modif: igraph or igrahp0
-	library('igraph0')
-	#library('igraph')
-#########
-	library('methods')###############################################
+	library('igraph0') # commence a 1
+
+######### DOSSIER DE SORTIE
+	name.dir<-paste(path,'Graph_Measures',templBaseName,'',sep='/') # faire une boucle sur le path pr avoir un dossier par run
 	
-	name.dir<-paste(path,'Graph_Measures/',sep='/')
+	system(paste('mkdir ',name.dir,sep='')) # Juste pour Unix (pour Windows dans le code Python)
 	
-	system(paste('mkdir ',name.dir,sep=''))
+	cat('serie_temp ',serie_temp,'n regions ',n.regions,' proc length ',proc.length,'\n')
 	
-	if(compute.cor){
-	    data.roi<-read.table(paste(path,'Functional/corrected_data/func_ROI_ts.txt',sep='/'))
+
+	if(compute.cor){# si compute.cor vaut 1 on rentre dans le if
+	    data.roi<-read.table(paste(path,'Functional/corrected_data',templBaseName,serie_temp,sep='/'))
 	    data.roi<-as.matrix(data.roi)
 ##### modifications - 10/10/12
 	# n.regions is given in function arguments
-		data.roi<-data.roi[,1:n.regions]
-	    proc.length<-dim(data.roi)[1]
+		data.roi<-data.roi[,1:n.regions] # prend le nb de region qu'on veut donc 78/79
+	    
 ##### end of modifications
-	    }
-	
-	cat('n regions ',n.regions,' proc length ',proc.length,'\n')
-	
-		
-	if(compute.cor){
-	    cor.list<-const.cor.list(as.matrix(data.roi), method = method, wf = wf,
+	    
+	    cor.list<-const.cor.list(data.roi, method = method, wf = wf,
 	                     n.levels = n.levels, boundary = boundary,
-	                     save.wave = FALSE, export.data = FALSE)
+	                     save.wave = FALSE, export.data = FALSE) # calcul des mat
 
 ##### modifications - 09/10/12	
 	### Test for zero on all the region ###
@@ -107,37 +110,39 @@ compute_MST <- function(Rpath,path,n.regions){
 	    }
 	}
 	
-
+#########################################################################################
+### GRAPHS
 	
 	if(graphs){
-	    coord<-paste(Rpath,'coord1.tt',sep='/')
-	
+	    coord<-paste(Rpath,file_coord,sep='/')
 	    set1 <- read.table(coord, header=TRUE)
-	    n.regions<-90
-	    set3 <- array(0,c(3,n.regions))
+	    set3 <- array(0,c(3,90))
 	    for(i in 1:3)
-		    set3[i,] <- set1[,i+1]
-	
+        set3[i,] <- set1[,i+1]
+        
 	    euclid <- 2 * dist(t(set3), method = "euclidean")
-	
 	    x.euclid <- as.matrix(euclid)
 	    #### only for scale num.levels
+        
+
 	    cor.mat<-read.table(paste(name.dir,'wave.cor.mat_n.levels_',num.levels,'_n.regions_',n.regions,'.grey.matter.txt',sep=''))
 	
-	    cat(paste(name.dir,'wave.cor.mat_n.levels_',num.levels,'_n.regions_',n.regions,'.grey.matter.txt',sep=''),'\n')
+	    cat(paste(name.dir,'wave.cor.mat_n.levels_',num.levels,'_n.regions_',n.regions,'.grey.matter.txt',sep=''),'\n') # affich la mat de correlation qu'on etudie
 	
 	    cor.mat<-as.matrix(cor.mat)
-	
-	    Eglob<-array(0,dim=c(length.nb.edges))
+        
+# parametres de base	
+	    Eglob<-array(0,dim=c(length.nb.edges)) # efficacite global= plus court chemin 1 valeur par nb aretes
 	    # moyenne sur le graphe de l'efficacite globale
-	    Eloc<-array(0,dim=c(length.nb.edges))
-	    tot.Eglob<-array(0,dim=c(n.regions,length.nb.edges))
+	    Eloc<-array(0,dim=c(length.nb.edges))# moyenne sur le graphe de l'efficacite locale = clustering
+	    tot.Eglob<-array(0,dim=c(n.regions,length.nb.edges)) # sur le total des regions 78X40
 	    tot.Eloc<-array(0,dim=c(n.regions,length.nb.edges))
-	    in.degree<-array(0,dim=c(n.regions,length.nb.edges))
+	    in.degree<-array(0,dim=c(n.regions,length.nb.edges))# degres
 
-	    tot.nbedges<-array(0,dim=c(length.nb.edges))
-	    tot.sup<-array(0,dim=c(length.nb.edges))
-	    
+	    tot.nbedges<-array(0,dim=c(length.nb.edges))# nb d'aretes selectionnes en tout car pas exactement le nb demandé au seuil (si 400 peut etre 395, 402 etc)
+	    tot.sup<-array(0,dim=c(length.nb.edges)) # valeur de correlation utilisee pr mettre le seuil (voir si pas tp faible ou pas tp fort)
+
+## parametres de graph	    
 	    Percolation<-array(0,dim=c(length.nb.edges))
 	    total_distance_connections<-array(0,dim=c(length.nb.edges))
 	    ratio_long_dist_connections<-array(0,dim=c(length.nb.edges))
@@ -152,21 +157,28 @@ compute_MST <- function(Rpath,path,n.regions){
 	    attack_robustness_nodes<-array(0,dim=c(max.nodes.removal,length.nb.edges))
 	    total_distance_connections_nodes<-array(0,dim=c(n.regions,length.nb.edges))
 	    
-	    fastgreedy.merges<-vector('list',length.nb.edges)
+	    fastgreedy.merges<-vector('list',length.nb.edges) # modularite
 	    fastgreedy.modularity<-vector('list',length.nb.edges)
+# matrice d'adjacence (meme taille mat corr) => meme VARIANCE pr ttes les paires, calculee a partir du nb de pts ds la serie temporelle
+	    adj.mat<-const.adj.mat(cor.mat, thresh = p, sup = 0.000000001, proc.length = proc.length,num.levels=num.levels) #on teste si c sup a zero
+	    
+################### /!\ /!\ /!\ A mettre en relation avec le nb d'aretes qu'on a choisi d'extraire au debut		
+	corr_zero<-sum(adj.mat)/2 # nb de correlation signif != 0 ( ne depend plus du seuil, nb de correlation qu'on a le dt d'extraire pr une mat donnee)
+	    cat('nb correlation signif diff zero ', c(sum(adj.mat)/2),'\n') # affiche le nb de correlation signif
 	
-	    adj.mat<-const.adj.mat(cor.mat, thresh = p, sup = 0.000000001, proc.length = proc.length,num.levels=num.levels)
-	    corr_zero<-sum(adj.mat)/2
-	    cat(c(sum(adj.mat)/2),'\n')
-
+	abs.cor.mat<-abs(cor.mat)
+	abs.cor.mat[adj.mat==1]->min_signif
+	min(min_signif)
+######################## boucle sur le nb d'aretes
 	    count<-1
 	    
-	    cost<-round(num.nb.edges/4005*100*(n.regions*(n.regions-1))/2/100)
-	    
+	    cost<-round(num.nb.edges/4005*100*(n.regions*(n.regions-1))/2/100) # nb d'aretes en % par rapport au nb total possible tous les 2.5% on commence a 5% car sinon 75 aretes pas suffisant pr minimum spaning tree
+
+# on ne garde pas les regions deconnectees donc on cree le minimum spanning tree    
 	    for(i in cost){
+		if (i<=corr_zero){
 	        # OK
 	        #### MST
-	        abs.cor.mat<-abs(cor.mat)
 	        diag(abs.cor.mat)<-rep(0,n.regions)
 	        MST<-mst(abs.cor.mat)>0 ### ajacency matrix with MST connextions
 	        MST_adj_mat<-MST
@@ -177,7 +189,7 @@ compute_MST <- function(Rpath,path,n.regions){
 	        cor_wo_MST<-pvalue.cor[MST_no_edges]
 	        
 	        pvalue.thresh <- sort(cor_wo_MST,decreasing=T)[i-(n.regions-1)] ### only valid for number of edges greater than n.regions
-	        n.sup<-pvalue.thresh
+	        n.sup<-pvalue.thresh # plus petite valeur de corr pr obtenir i aretes
 	        test.sign <- (pvalue.cor >= pvalue.thresh)
 	        l <- 1
 	        for (k in 2:(n.regions)) {
@@ -188,14 +200,14 @@ compute_MST <- function(Rpath,path,n.regions){
 	                else{
 	                    if(MST[k,q]==1){ 
 	                        adj.mat[k, q] <- 1
-	                        cat('MST edges',k,' ',q,'\n')
+	                        cat('MST edges',k,' ',q,' ',abs.cor.mat[k,q],'\n')
 	                    }
 	                }
 	                l <- l + 1
 	            }
 	        }
 
-	        adj.mat<-adj.mat+t(adj.mat)
+	        adj.mat<-adj.mat+t(adj.mat) # matrice d'adjacence avec i aretes premier a 5%=150 aretes
 	
 	        print(c(i,"*****",n.sup))
 	        
@@ -240,7 +252,7 @@ compute_MST <- function(Rpath,path,n.regions){
 	        count<-count+1
 	
 	    }
-
+	}
 	    write.table(Eglob,paste(name.dir,'Eglob_mean_n.levels_',num.levels,'_n.regions_',n.regions, '.mst.grey.matter.txt',sep=''),col.names=F,row.names=F,quote=F)
 	    
 	    write.table(Eloc,paste(name.dir,'Eloc_mean_n.levels_',num.levels,'_n.regions_',n.regions, '.mst.grey.matter.txt',sep=''),col.names=F,row.names=F,quote=F)
@@ -257,7 +269,7 @@ compute_MST <- function(Rpath,path,n.regions){
 	    write.table(tot.Eloc,paste(name.dir,'Eloc_n.levels_',num.levels,'_n.regions_',n.regions, '.mst.grey.matter.txt',sep=''),col.names=F,row.names=F,quote=F)
 	    
 	    
-	    write.table(corr_zero,paste(name.dir,'corr_zero_n.levels_',num.levels,'_n.regions_',n.regions, '.mst.grey.matter.txt',sep=''),col.names=F,row.names=F,quote=F)
+	    write.table(c(corr_zero,min_signif),paste(name.dir,'corr_zero_n.levels_',num.levels,'_n.regions_',n.regions, '.mst.grey.matter.txt',sep=''),col.names=F,row.names=F,quote=F)
 	    
 	    write.table(Percolation,paste(name.dir,'Percolation_n.levels_',num.levels,'_n.regions_', n.regions,'.mst.grey.matter.txt',sep=''),col.names=F,row.names=F,quote=F)
 	    
@@ -279,61 +291,58 @@ compute_MST <- function(Rpath,path,n.regions){
 
 #############################################################################################################################################
 
-read_results <- function(Rpath,path,n.regions){
+read_results <- function(Rpath,path,n.regions,file_coord,proc.length){
 # from read_results_patients_Vaude.R
 	
 	library(Cairo)
 ######### modif: igraph or igrahp0
+
 	library('igraph0')
-	#library('igraph')
 #########
-	library('methods')###############################################
 	
 	source(paste(Rpath,'parameters.R',sep='/'))
 	source(paste(Rpath,'evaluate_knn.R',sep='/'))
 	#n.regions<-90	#### modif 10/10/12
 	
-	a<-unlist(strsplit(path, "/"))
+	a<-unlist(strsplit(path, "/"))# recupere le nom du fichier pr en faire un titre
 	print(tail(a,1))
 	ref<-tail(a,1)
 	b<-unlist(strsplit(ref, ""))
 	
 	Sujet <- ""
 	
-	coord<-paste(Rpath,'coord1.tt',sep='/')# a corriger
+	coord<-paste(Rpath,file_coord,sep='/')
 	
-	set1 <- read.table(coord, header=TRUE)
+	set2 <- read.table(coord)
 	
-	set3 <- array(0,c(3,n.regions))
-	for(i in 1:3)
-		set3[i,] <- set1[,i+1]
-	
-	euclid <- 2 * dist(t(set3), method = "euclidean")
+	euclid <- 2 * dist(set2, method = "euclidean")
 	
 	x.euclid <- as.matrix(euclid)
 	
-	set2 <- read.table(coord, header=TRUE)
-	index <- c(1:(n.regions/2))*2
-	set2 <- set2[,-1]
+	index <- c(1:(n.regions/2))*2 # regions gauches et droites
 	set2 <- as.matrix(set2)
-	set2[index,c(1,2)] <- set2[index,c(1,2)] + 1.5	
+	set2[index,c(2,3)] <- set2[index,c(2,3)] + 10 #	decale les pts superposes sur le graphe
 	
 	n.levels<-num.levels
 	
-	labels.names<-c("Occipital","Parietal","Sensorimotor","Premotor","Prefrontal","Orbitofrontal","Temporal pole","Inferior temporal")
-	labels.coord<-matrix(c(13,40,25,70,50,80,70,75,95,55,90,25,75,15,40,25),2,8) 
-	
-	name.dir<-paste(path,"Graph_Measures/",sep="/")
-	
-	
-	for(dim.edges in num.nb.edges){
+	name.dir<-paste(path,"Graph_Measures/",sep="/") # sortie
+
+#lecture mat corr
+	cor.mat<-read.table(paste(name.dir,'wave.cor.mat_n.levels_',num.levels,'_n.regions_',n.regions,'.grey.matter.txt',sep=''))
+	cor.mat<-as.matrix(cor.mat)
+	abs.cor.mat<-abs(cor.mat) # val abs
+
+	adj.mat<-const.adj.mat(cor.mat, thresh = p, sup = 0.000000001, proc.length = proc.length,num.levels=num.levels) #on teste si c sup a zero    	
+	corr_zero<-sum(adj.mat)/2 # nb
+
+	cost<-round(num.nb.edges/4005*100*(n.regions*(n.regions-1))/2/100)# vect %
+
+	for(dim.edges in cost){
+		if (dim.edges < corr_zero){
 	    CairoPDF(file=paste(name.dir,'graph_',Sujet,ref,'_dim',dim.edges,'.pdf',sep=''),width = 14, height = 8,family='times')
 	    par(mar=c(4.5, 0.1, 5, 0.3),mfrow=c(1,2))
 	    
-	    # Matrice d'adjacence
-	    cor.mat<-read.table(paste(name.dir,'wave.cor.mat_n.levels_',num.levels,'_n.regions_',n.regions,'.grey.matter.txt',sep=''))
-	    cor.mat<-as.matrix(cor.mat)
-	    abs.cor.mat<-abs(cor.mat)
+	    # RECALCULE Matrice d'adjacence
 	    diag(abs.cor.mat)<-rep(0,n.regions)
 	    MST<-mst(abs.cor.mat)>0 ### ajacency matrix with MST connextions
 	    MST_adj_mat<-MST
@@ -357,7 +366,7 @@ read_results <- function(Rpath,path,n.regions){
 	                adj.mat[k, q] <- 1
 	            }else{
 	                if(MST[k,q]==1){ adj.mat[k, q] <- 1
-	                    cat('MST edges',k,' ',q,'\n')
+	                    #cat('MST edges',k,' ',q,'\n')
 	                }
 	            }
 	            l <- l + 1
@@ -366,12 +375,12 @@ read_results <- function(Rpath,path,n.regions){
 	    adj.mat<-adj.mat+t(adj.mat)
 	    
 	    
-	    x.coord<-2
-	    y.coord<-1
+	    x.coord<-1 #i
+	    y.coord<-2 # j
 	    
-	    plot(set2[,x.coord], set2[,y.coord], type = "p",xlab= "", ylab="",cex.lab=2,asp=1,ylim=c(14,81),xlim=c(5,105),xaxt='n',yaxt='n',bty='n',main=paste(Sujet,ref,dim.edges),cex=0.5,pch=16,cex.main=2)
+	    plot(set2[,x.coord], set2[,y.coord], type = "p",xlab= "", ylab="",cex.lab=2,asp=1,ylim=c(min(set2[,y.coord]),max(set2[,y.coord])),xlim=c(min(set2[,x.coord]),max(set2[,x.coord])),xaxt='n',yaxt='n',bty='n',main=paste(Sujet,ref,dim.edges),cex=0.5,pch=16,cex.main=2) #points noirs
 	    
-	    text(labels.coord[1,],labels.coord[2,],labels.names,cex = 1)
+	   ### text(labels.coord[1,],labels.coord[2,],labels.names,cex = 1)
 	    
 	    for(kk in 2:(n.regions)){
 	        for(q in 1:(kk-1)){
@@ -379,7 +388,7 @@ read_results <- function(Rpath,path,n.regions){
 	            if(adj.mat[kk,q]==1)
 	            {
 	                        
-	                if(x.euclid[kk,q]>85) visu <- "blue" 
+	                if(x.euclid[kk,q]>85) visu <- "blue" #longues/courtes arretes, A CHANGER
 	                    else visu <- "red"
 	                lines(c(set2[kk,x.coord], set2[q,x.coord]), c(set2[kk,y.coord], set2[q,y.coord]), col = visu,lw=2)
 	            }
@@ -387,10 +396,11 @@ read_results <- function(Rpath,path,n.regions){
 	        }
 	    }
 	    
-	    x.coord<-3
-	    y.coord<-2
+	    x.coord<-2 #j
+	    y.coord<-3 #k
+
+	    plot(set2[,x.coord], set2[,y.coord], type = "p",xlab= "", ylab="",cex.lab=2,asp=1,ylim=c(min(set2[,y.coord]),max(set2[,y.coord])),xlim=c(min(set2[,x.coord]),max(set2[,x.coord])),xaxt='n',yaxt='n',bty='n',main=paste(Sujet,ref,dim.edges),cex=0.5,pch=16,cex.main=2) #points noirs
 	    
-	    plot(set2[,x.coord], set2[,y.coord], type = "p",xlab= "", ylab="",cex.lab=2,asp=1,ylim=c(18,100),xlim=c(15,75),xaxt='n',yaxt='n',bty='n',cex=0.5,pch=16,cex.main=2)
 	    
 	    #text(labels.coord[1,],labels.coord[2,],labels.names,cex = 2)
 	    
@@ -411,7 +421,7 @@ read_results <- function(Rpath,path,n.regions){
 	}
 	
 }
-
+}
 #############################################################################################################################################
 
 plot_mvt <- function(Rpath,path){
@@ -430,7 +440,7 @@ plot_mvt <- function(Rpath,path){
 	par(mfrow=c(2,1))	
 	
 	path.mov<-list.files(path=paste(path,'Functional/Realigned/',sep='/'),pattern=glob2rx("rp*.txt"))
-	mvt <- read.table(paste(path,'Functional/Realigned/',path.mov,sep='/'), header=FALSE)
+	mvt <- read.table(paste(path,'Functional/Realigned/',path.mov,sep='/'), header=FALSE)# fichiers des param de mvts
 	
 	ymin<-min(mvt[,1:3])-0.05
 	ymax<-max(mvt[,1:3])+0.05

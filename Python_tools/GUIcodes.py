@@ -657,7 +657,7 @@ class mainWindow(Tk):
             Otherwise the new window is a WinChooseRep object.
             In all cases, the listbox corresponding to the case is updated with new folders list."""        
         if self.case.get() == "one":
-            t = tkFileDialog.askdirectory(parent=self.master, initialdir="~/Documents/NetBeansProjects/Original/Exam0", title='Please select a directory')
+            t = tkFileDialog.askdirectory(parent=self.master, initialdir="~/Documents/NetBeansProjects/rootPatient/Patient/Patient1/Original/Exam0", title='Please select a directory')
             if t != "":
                 del self.examList
                 self.examList = list()
