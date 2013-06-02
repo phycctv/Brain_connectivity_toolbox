@@ -293,13 +293,12 @@ class graphComputing():
         self.name2 = "graphcomputing"
         self.case = "functional"
         self.nb = 3
-        self.nbReg = 90
-        
         if "tempFileName" in param:
             self.tmpfile = param["tempFileName"]
         
         if "repR" in param:
             self.repR = param["repR"]
+        self.param = param
         self.dataset = list()
         self.resultRep = list()
         self.todo = list()
@@ -355,22 +354,30 @@ class graphComputing():
                 if path.exists(self.resultRep[i] + "Graph_Measures/" + templBaseName + "/") is False:
                     mkdir(self.resultRep[i] + "Graph_Measures/" + templBaseName + "/")
                 r.source(self.repR + "/computeGraphs.R")
-                r.compute_Graph(self.repR, self.resultRep[i],templBaseName,"coord1.tt",1,True)
+                r.compute_Graph(self.repR, self.resultRep[i],templBaseName,self.param["allCoordFile"][templBaseName],1,True) 
                 
             
     def DoGraphs(self, i):
             import rpy2.robjects as robjects
             r = robjects.r
             print("***** Start do graphs") 
-            r.source(self.repR + "/computeGraphs.R")
-            r.read_results(self.repR, self.resultRep[i], self.nbReg)
+            for templBaseName in self.templBaseNames:
+                if sys.platform == "win32":
+                    templBaseName = templBaseName.replace('\\','/')
+                templBaseName = templBaseName.split("/")[-1].split("_u_rc")[0].replace("natw","")
+                r.source(self.repR + "/computeGraphs.R")
+                r.read_results(self.repR, self.resultRep[i],templBaseName,self.param["allCoordFile"][templBaseName])
 
     def CalculateMoves(self, i):
             import rpy2.robjects as robjects
             r = robjects.r
             print("***** Start calculate moves") 
-            r.source(self.repR + "/computeGraphs.R")
-            r.plot_mvt(self.repR, self.resultRep[i])
+            for templBaseName in self.templBaseNames:
+                if sys.platform == "win32":
+                    templBaseName = templBaseName.replace('\\','/')
+                templBaseName = templBaseName.split("/")[-1].split("_u_rc")[0].replace("natw","")
+                r.source(self.repR + "/computeGraphs.R")
+                r.plot_mvt(self.repR, self.resultRep[i],templBaseName)
 
 
 

@@ -33,6 +33,7 @@ version 2.0
 
 from os import mkdir, path, getcwd
 from time import strftime
+import sys
 
 startTime = strftime("%A %d %B %Y %H:%M")
 startTime2 = strftime("%Y_%m_%d_%Hh%M")
@@ -48,9 +49,16 @@ print "      ******************************************\n"
 
 from config import settings
 param = settings()
-from loadAndCheck import setMode
-param = setMode(param)
-print param
+try:
+    if (sys.argv[1] == "script") or (sys.argv[1] == "s"):
+        param["mode"] = "script"
+    elif sys.argv[1] == "--mode" or sys.argv[1] == "-m":
+        from loadAndCheck import setMode
+        param = setMode(param)
+    else:
+        param["mode"] = "graph"
+except IndexError:
+        param["mode"] = "graph"
 
 
 # ---------------------------- LOAD DATA ---------------------------------- #

@@ -202,6 +202,7 @@ class mainWindow(Tk):
         self.processList = list()  # ["realign","dartel"]
         self.allProcessDict = dict()
         self.allProcessList = list()
+        self.allCoordFile = dict()
         self.case1 = StringVar()
         self.case1.set('normal')
         self.case2 = StringVar()
@@ -425,6 +426,7 @@ class mainWindow(Tk):
         self.fproc = Frame(frame, bd=1, relief='sunken')
         self.fproc.grid(column=0, row=3, columnspan=2, sticky='nsew')
         self.processChoice()
+        self.coordChoice()
                 
         # ----- Quit ---------------------------------------------------------------------------------------
         fquit = Frame(frame)
@@ -467,7 +469,7 @@ class mainWindow(Tk):
         
         from functionsInfo import allFunctions
         fctInfo = allFunctions()
-        self.fctList = fctInfo.fctList(self.param["case"])
+        self.fctList = fctInfo.fctList(self.param["case"]) 
         self.chosenFct = list()
         self.fctWidget = list()
         
@@ -518,6 +520,13 @@ class mainWindow(Tk):
             self.preprocR1.grid(column=1, row=0)
             self.preprocR2.grid(column=2, row=0)
 
+    def coordChoice(self):
+        fdetails2 = Frame(self.fproc, bd=1, relief='sunken')
+        fdetails2.grid(column=3, row=1, sticky='nse')
+        self.coordChoiceTitle = Label(fdetails2, text="Set Coordinates file(s) \n for each template \n(for Graph computing)", state=self.procState.get())
+        self.coordChoiceTitle.grid(column=3, row=3, sticky='nsw')
+        self.coordButton = Button(fdetails2, text=u"click here", command=self.defineCoord, state=self.procState.get())
+        self.coordButton.grid(column=3, row=4)
     def updateFctList(self):
         
         self.process = list()
@@ -544,8 +553,15 @@ class mainWindow(Tk):
                 self.preprocButton.config(state=self.procState.get())
                 self.preprocOverW.config(state=self.procState.get())
                 self.preprocR1.config(state=self.procState.get())
-                self.preprocR2.config(state=self.procState.get())                    
-        
+                self.preprocR2.config(state=self.procState.get())  
+            if self.fctList[i] == "graph computing":
+                if self.chosenFct[i + 1].get() == 1:
+                    self.procState.set("normal")
+                else:
+                    self.procState.set("disable")
+                    
+                self.coordChoiceTitle.config(state=self.procState.get())
+                self.coordButton.config(state=self.procState.get())
     def scrollWindow(self, event):
         """ Vertical scrolling window with mouse wheel.
         /!\ to be tested for windows        """
@@ -600,6 +616,12 @@ class mainWindow(Tk):
         """ Template and atlas choice for each SPM functions in self.allProcessList list. Call WinCheckTempl class object."""
         if (self.processList != []) and (self.processList != ()):
             WinCheckTempl(self)
+    def defineCoord(self):
+        """"""
+        if len(self.processList) !=0 or len(self.examList) !=0:
+            WinSetCoord(self)
+        else:
+            tkMessageBox.showwarning(title="Warning", message="No data folder!\nGive at least one directory to dataset.")
             
     def changeState(self):
         """ Changes widgets state (normal or disable) for the repertories selection, depending on the choice of case :
@@ -826,7 +848,7 @@ class mainWindow(Tk):
                     if txt != "":
                         tkMessageBox.showwarning(title="Warning", message="Errors in functions choice:\n" + txt + "Check function order.")
                         del run, pb, allPreprocessInfo
-           
+                    
                     # save parameters and quit
                     else:
                         
@@ -840,17 +862,20 @@ class mainWindow(Tk):
                                         self.param["repR"] = tkFileDialog.askdirectory(parent=self.master, initialdir="/", title='Wrong directory for R scripts, please select another one:')                                    
                             else:
                                 self.param["repR"] = tkFileDialog.askdirectory(parent=self.master, initialdir="/", title='Please select a directory for R scripts:')
-                                
-                        for p in self.examList:
-                            self.param["examRep"] += [p]
-                        self.param["overwrite"] = self.overwrite.get()
-                        self.param["process"] = self.process
-                        self.param["preprocess"] = self.processList
-                        self.param["allPreprocess"] = self.allProcessList
-                        self.param["allPreprocessInfo"] = allPreprocessInfo
-                        self.param["run"] = run
-                        self.param["pb"] = pb                   
-                        self.destroy()
+                        if "graph computing" in self.process and len(self.allCoordFile) == 0:
+                            tkMessageBox.showwarning(title="Warning", message= "Please choose coordinates file(s) for graph computing")
+                        else:
+                            for p in self.examList:
+                                self.param["examRep"] += [p]
+                            self.param["overwrite"] = self.overwrite.get()
+                            self.param["process"] = self.process
+                            self.param["preprocess"] = self.processList
+                            self.param["allPreprocess"] = self.allProcessList
+                            self.param["allCoordFile"] = self.allCoordFile.copy()
+                            self.param["allPreprocessInfo"] = allPreprocessInfo
+                            self.param["run"] = run
+                            self.param["pb"] = pb                   
+                            self.destroy()
                        
             
 # ----------------------------------------------------------------------------------- #
@@ -1486,7 +1511,157 @@ Warning : all changes done in reference files with this class are lost when user
             For each function, master attribute master.allProcessDict, which gives function information, is updated with reference files list.
             For function i: master.allProcessDict[function i].template["name"] get files names from templName[i] (text split into list).
             Method called by button "OK"."""
-        
+            
         for i, f in enumerate(self.master.allProcessList):
             self.master.allProcessDict[f].template["name"] = self.templName[i].get().split("\n")
         self.destroy()
+class WinSetCoord(Toplevel):
+    
+    def __init__(self, master):
+        Toplevel.__init__(self, master)
+        self.master = master
+        self.coordFiles = dict()
+        self.initialize(master)
+        self.focus_set()
+        self.grab_set()
+    def initialize(self, master):
+        """"""
+        
+        self.grid()
+        self.title("Coordinates file(s)")
+
+        # columns names
+        Label(self, text="Function:", justify='center', anchor="s").grid(column=0, row=0)
+        irow = 0
+        if self.master.chosenFct[1].get() == 1:
+            Label(self, text="Corresponding coordinates file(s):", justify='center', anchor="s").grid(column=1, row=0)
+            for i, f in enumerate(self.master.allProcessList):
+                if f == 'iwarp' or f == 'iwarp_finergrid':
+                    for templBaseName in self.master.allProcessDict[f].template["name"]:
+                        templBaseName = templBaseName.split("/")[-1].split(".")[0]
+                        irow = irow + 1
+                        # function name            
+                        Label(self, text=templBaseName, justify='center', anchor="s").grid(column=0, row=irow)
+                        # state : active if template exists
+                        stateLab = StringVar()
+                        stateLab.set('normal')
+                        bgCol1 = "#BFCFFE"
+                        bgCol2 = "#6699FF"
+                        # templates names list
+                        if self.master.allCoordFile.has_key(templBaseName):
+                            tNameText = self.master.allCoordFile[templBaseName]
+                        else:
+                            tNameText = "cool"#list2text(self.master.allProcessDict[f].template["name"])
+                        self.coordFiles.update({templBaseName:StringVar()})
+                        self.coordFiles[templBaseName].set(tNameText)
+                        fbg = Frame(self,background=bgCol2, bd=1)
+                        fbg.grid(column=1, row=irow, sticky='nw')
+                        tLabel = Label(fbg, textvariable=self.coordFiles[templBaseName], justify='right', anchor="e",bg=bgCol1, width=40, state=stateLab.get())
+                        tLabel.grid(column=0, row=0, sticky='w')
+                        # change
+                        change = Button(self, text=u"Change file", command=lambda x=templBaseName, y=irow-1:self.ChangeCoordFile(x, y), anchor='w', state=stateLab.get()) 
+                        change.grid(column=2, row=irow)
+            if irow == 0:
+                irow = irow+1
+                Label(self, text="No template chosen for data preprocessing:", justify='center', anchor="s").grid(column=1, row=1)
+        elif self.master.chosenFct[3].get() == 1:
+            from os import path
+            f = self.master.examList[0]
+            if path.exists(f.replace("Original", "Processed")+"/Anat/Atlased/"):
+                Label(self, text="For datas already atlased(realigned)", justify='center', anchor="s").grid(column=1, row=0)
+                self.templBaseNames = glob.glob(f.replace("Original", "Processed") + "/Anat/Atlased/natw*.nii")
+                for templBaseName in self.templBaseNames:
+                    if sys.platform == "win32":
+                        templBaseName = templBaseName.replace('\\','/')
+                    templBaseName = templBaseName.split("/")[-1].split("_u_rc")[0].replace("natw","")
+                    irow = irow + 1
+                    # function name            
+                    Label(self, text=templBaseName, justify='center', anchor="s").grid(column=0, row=irow)
+
+                    stateLab = StringVar()
+                    stateLab.set('normal')
+                    bgCol1 = "#BFCFFE"
+                    bgCol2 = "#6699FF"
+                    # templates names list
+                    if self.master.allCoordFile.has_key(templBaseName):
+                        tNameText = self.master.allCoordFile[templBaseName]
+                    else:
+                        tNameText = "cool"#list2text(self.master.allProcessDict[f].template["name"])
+                    self.coordFiles.update({templBaseName:StringVar()})
+                    self.coordFiles[templBaseName].set(tNameText)
+                    fbg = Frame(self,background=bgCol2, bd=1)
+                    fbg.grid(column=1, row=irow, sticky='nw')
+                    tLabel = Label(fbg, textvariable=self.coordFiles[templBaseName], justify='right', anchor="e",bg=bgCol1, width=40, state=stateLab.get())
+                    tLabel.grid(column=0, row=0, sticky='w')
+                    # change
+                    change = Button(self, text=u"Change file", command=lambda x=templBaseName, y=irow-1:self.ChangeCoordFile(x, y), anchor='w', state=stateLab.get()) 
+                    change.grid(column=2, row=irow)
+            else:
+                Label(self, text="No data atlased(realigned), please do data preprocessing first:", justify='center', anchor="s").grid(column=1, row=0)
+        else:
+            from os import path
+            f = self.master.examList[0]
+            if path.exists(f.replace("Original", "Processed")+"/Functional/corrected_data/"):
+                Label(self, text="For file(s) time series extraction already exist", justify='center', anchor="s").grid(column=1, row=0)
+                self.templBaseNames = glob.glob(f.replace("Original", "Processed") + "/Functional/corrected_data/*/func_ROI*_ts.txt")
+                for templBaseName in self.templBaseNames:
+                    if sys.platform == "win32":
+                        templBaseName = templBaseName.replace('\\','/')
+                    templBaseName = templBaseName.split("/")[-1].replace("func_ROI_","").replace("_ts.txt","")
+                    irow = irow + 1
+                    # function name            
+                    Label(self, text=templBaseName, justify='center', anchor="s").grid(column=0, row=irow)
+                    # state : active if template exists
+                    stateLab = StringVar()
+                    stateLab.set('normal')
+                    bgCol1 = "#BFCFFE"
+                    bgCol2 = "#6699FF"
+                    # templates names list
+                    if self.master.allCoordFile.has_key(templBaseName):
+                        tNameText = self.master.allCoordFile[templBaseName]
+                    else:
+                        tNameText = "cool"#list2text(self.master.allProcessDict[f].template["name"])
+                    self.coordFiles.update({templBaseName:StringVar()})
+                    self.coordFiles[templBaseName].set(tNameText)
+                    fbg = Frame(self,background=bgCol2, bd=1)
+                    fbg.grid(column=1, row=irow, sticky='nw')
+                    tLabel = Label(fbg, textvariable=self.coordFiles[templBaseName], justify='right', anchor="e",bg=bgCol1, width=40, state=stateLab.get())
+                    tLabel.grid(column=0, row=0, sticky='w')
+                    # change
+                    change = Button(self, text=u"Change file", command=lambda x=templBaseName, y=irow-1:self.ChangeCoordFile(x, y), anchor='w', state=stateLab.get()) 
+                    change.grid(column=2, row=irow)
+            else:
+                Label(self, text="No file(s) time series extraction exist, please check", justify='center', anchor="s").grid(column=1, row=0)
+
+
+        # Quit
+        Button(self, text=u"OK", command=self.clickOK).grid(column=1, row=irow + 1)
+        Button(self, text=u"Cancel", command=self.destroy).grid(column=0, row=irow + 1)
+
+    def ChangeCoordFile(self, f, i):
+        """"""
+        import os
+        fileName = tkFileDialog.askopenfilename(parent=self, initialdir=self.master.param["repSPM"], title='Please select file for ' + f)      
+        if (fileName != "") and (fileName != ()):
+            print fileName
+            if sys.platform == "win32":
+                fileName = fileName.replace(" ","\n") # ¨¤ am¨¦liorer(quand il y a des espaces dans le nom de fichier)
+            else:
+                fileName = list2text(fileName)
+            self.coordFiles[f].set(fileName)
+
+
+    def clickOK(self):
+        """"""
+        import os
+        ok = True
+        for f in self.coordFiles:
+            if os.path.isfile(self.coordFiles[f].get()):
+                self.master.allCoordFile[f] = self.coordFiles[f].get()
+            else:
+                ok = False
+                tkMessageBox.showwarning(title="Warning", message= self.coordFiles[f].get()+ " is not a file")
+
+        print self.master.allCoordFile
+        if ok is True:
+            self.destroy()

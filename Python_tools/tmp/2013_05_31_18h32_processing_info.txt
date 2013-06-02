@@ -1,0 +1,4 @@
+Friday 31 May 2013 18:32
+
+Parameters set with GUI.
+Functional fMRI data processed.

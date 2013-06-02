@@ -61,6 +61,9 @@ def loadParameter(param):
             app.title("~ Case ~")
             app.focus_force()
             app.mainloop()
+            if "case" not in param :
+                print "Window closed by user, programme exit(0)"
+                exit(0)
     
             # other parameters
             app = mainWindow(None, param)

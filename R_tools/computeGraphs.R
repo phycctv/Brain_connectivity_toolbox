@@ -14,23 +14,21 @@
 # if your version is older than 0.6, use package igraph0
 
 
-#compute_Graph("/home/cindy/Bureau/","/home/cindy/Bureau/celiaOFF/celia090212withCSF/",78,"celia.090212.r01.withCSF_AllROIs","file_coord.txt")
-
-compute_Graph <- function(Rpath,path,templBaseName,file_coord,compute.cor,graphs)# path endroit ou il ya les fichiers, Rpath endroit ou il y a les fichiers fonction de R
+compute_Graph <- function(Rpath,path,templBaseName,file_coord,compute_cor, graphs)# path endroit ou il ya les fichiers, Rpath endroit ou il y a les fichiers fonction de R
 {
     serie_temp<-paste('func_ROI_',templBaseName,'_ts.txt',sep='')
 	data.roi<-read.table(paste(path,'Functional/corrected_data',templBaseName,serie_temp,sep='/'))
 	proc.length<-dim(data.roi)[1]
-	n.regions<-dim(data.roi)[2]-1 # /!\ a changer selon le nb de regions souhaitees
+	n.regions<-dim(data.roi)[2] # /!\ a changer selon le nb de regions souhaitees
 	cat("nb_pt_tps ", proc.length, " nb_regions ", n.regions,"\n")
 
 	source(paste(Rpath,'parameters.R',sep='/')) # utilise les param du fichiers param
 	source(paste(Rpath,'evaluate_knn.R',sep='/')) # appel de la fonction
 	
-	#compute.cor<-0 # calcul des mat de correlation mettre a 0 pour ne pas calculer
+	#compute_cor<-0 # calcul des mat de correlation mettre a 0 pour ne pas calculer
 	
 	#graphs<-TRUE # calcul des graphs, FALSE pr ne pas faire tourner
-	
+
 	library('brainwaver')
 	
 ######### modif: igraph or igrahp0
@@ -44,7 +42,7 @@ compute_Graph <- function(Rpath,path,templBaseName,file_coord,compute.cor,graphs
 	cat('serie_temp ',serie_temp,'n regions ',n.regions,' proc length ',proc.length,'\n')
 	
 
-	if(compute.cor){# si compute.cor vaut 1 on rentre dans le if
+	if(compute_cor){# si compute_cor vaut 1 on rentre dans le if
 	    data.roi<-read.table(paste(path,'Functional/corrected_data',templBaseName,serie_temp,sep='/'))
 	    data.roi<-as.matrix(data.roi)
 ##### modifications - 10/10/12
@@ -114,13 +112,11 @@ compute_Graph <- function(Rpath,path,templBaseName,file_coord,compute.cor,graphs
 ### GRAPHS
 	
 	if(graphs){
-	    coord<-paste(Rpath,file_coord,sep='/')
-	    set1 <- read.table(coord, header=TRUE)
-	    set3 <- array(0,c(3,90))
-	    for(i in 1:3)
-        set3[i,] <- set1[,i+1]
+	    coord<-paste(file_coord)
+	    set1 <- read.table(coord) # lecture fichier coord
         
-	    euclid <- 2 * dist(t(set3), method = "euclidean")
+	    euclid <- 2 * dist(set1, method = "euclidean") # calc distance euclidienne entre ROI a partir des coordonnees
+        
 	    x.euclid <- as.matrix(euclid)
 	    #### only for scale num.levels
         
@@ -291,7 +287,7 @@ compute_Graph <- function(Rpath,path,templBaseName,file_coord,compute.cor,graphs
 
 #############################################################################################################################################
 
-read_results <- function(Rpath,path,n.regions,file_coord,proc.length){
+read_results <- function(Rpath,path,templBaseName,file_coord){
 # from read_results_patients_Vaude.R
 	
 	library(Cairo)
@@ -299,7 +295,10 @@ read_results <- function(Rpath,path,n.regions,file_coord,proc.length){
 
 	library('igraph0')
 #########
-	
+    serie_temp<-paste('func_ROI_',templBaseName,'_ts.txt',sep='')
+	data.roi<-read.table(paste(path,'Functional/corrected_data',templBaseName,serie_temp,sep='/'))
+	proc.length<-dim(data.roi)[1]
+	n.regions<-dim(data.roi)[2] # /!\ a changer selon le nb de regions souhaitees
 	source(paste(Rpath,'parameters.R',sep='/'))
 	source(paste(Rpath,'evaluate_knn.R',sep='/'))
 	#n.regions<-90	#### modif 10/10/12
@@ -311,7 +310,7 @@ read_results <- function(Rpath,path,n.regions,file_coord,proc.length){
 	
 	Sujet <- ""
 	
-	coord<-paste(Rpath,file_coord,sep='/')
+	coord<-paste(file_coord)
 	
 	set2 <- read.table(coord)
 	
@@ -325,7 +324,7 @@ read_results <- function(Rpath,path,n.regions,file_coord,proc.length){
 	
 	n.levels<-num.levels
 	
-	name.dir<-paste(path,"Graph_Measures/",sep="/") # sortie
+	name.dir<-paste(path,'Graph_Measures',templBaseName,'',sep='/') # sortie
 
 #lecture mat corr
 	cor.mat<-read.table(paste(name.dir,'wave.cor.mat_n.levels_',num.levels,'_n.regions_',n.regions,'.grey.matter.txt',sep=''))
@@ -424,7 +423,7 @@ read_results <- function(Rpath,path,n.regions,file_coord,proc.length){
 }
 #############################################################################################################################################
 
-plot_mvt <- function(Rpath,path){
+plot_mvt <- function(Rpath,path,templBaseName){
 # from plot_mvt.R
 	
 	library(Cairo)
@@ -435,8 +434,8 @@ plot_mvt <- function(Rpath,path){
 	b<-unlist(strsplit(ref, ""))
 
 	Sujet <- ""
-	print(paste(path,'/Graph_Measures/mvt_zoom_',Sujet,ref,'.pdf',sep=''))
-	pdf(paste(path,'/Graph_Measures/mvt_zoom_',Sujet,ref,'.pdf',sep=''))
+	print(paste(path,'/Graph_Measures/',templBaseName,'/mvt_zoom_',Sujet,ref,'.pdf',sep=''))
+	pdf(paste(path,'/Graph_Measures/',templBaseName,'/mvt_zoom_',Sujet,ref,'.pdf',sep=''))
 	par(mfrow=c(2,1))	
 	
 	path.mov<-list.files(path=paste(path,'Functional/Realigned/',sep='/'),pattern=glob2rx("rp*.txt"))
@@ -458,9 +457,9 @@ plot_mvt <- function(Rpath,path){
 	legend(x='topleft',legend=c('pitch','roll','yaw'),col=c('blue','green','red'),lty=1)
 	dev.off()
 	
-	CairoPDF(file=paste(path,'/Graph_Measures/mvt_',ref,'.pdf',sep=''),width = 15, height = 11)
+	CairoPDF(file=paste(path,'/Graph_Measures/',templBaseName,'/mvt_',ref,'.pdf',sep=''),width = 15, height = 11)
 	par(mfrow=c(1,2))
-	print(paste(path,'/Graph_Measures/mvt_',Sujet,ref,'.pdf',sep=''))
+	print(paste(path,'/Graph_Measures/',templBaseName,'/mvt_',Sujet,ref,'.pdf',sep=''))
 	
 	ymin<- -20
 	ymax<-20
