@@ -426,7 +426,8 @@ class mainWindow(Tk):
         self.fproc = Frame(frame, bd=1, relief='sunken')
         self.fproc.grid(column=0, row=3, columnspan=2, sticky='nsew')
         self.processChoice()
-        self.coordChoice()
+        if self.param["case"] == "functional":
+            self.coordChoice()
                 
         # ----- Quit ---------------------------------------------------------------------------------------
         fquit = Frame(frame)
