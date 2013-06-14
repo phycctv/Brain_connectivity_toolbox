@@ -255,14 +255,21 @@ class mainWindow(Tk):
         frame.pack(fill=BOTH, expand=1) 
         
         # ----- choose case -------------------------------------------------------------------------------
-        label = Label(frame, text="Case:")
-        label.grid(column=0, row=0, sticky='w')
-        self.case = StringVar()
-        c1 = Radiobutton(frame, text="one data set", variable=self.case, value="one", command=self.changeState)
-        c2 = Radiobutton(frame, text="several data sets", variable=self.case, value="sev", command=self.changeState)
-        c1.select()
-        c1.grid(column=0, row=1)
-        c2.grid(column=1, row=1)   
+        if self.param["case"] == "functional":
+            label = Label(frame, text="Case:")
+            label.grid(column=0, row=0, sticky='w')
+            self.case = StringVar()
+            c1 = Radiobutton(frame, text="one data set", variable=self.case, value="one", command=self.changeState)
+            c2 = Radiobutton(frame, text="several data sets", variable=self.case, value="sev", command=self.changeState)
+            c1.select()
+            c1.grid(column=0, row=1)
+            c2.grid(column=1, row=1)   
+        elif self.param["case"] == "diffusion":
+            # ----- For diffusion there are only one case -------------------------------------------------
+            label = Label(frame, text="Case:")
+            label.grid(column=0, row=0, sticky='w')
+            self.case = StringVar()
+            self.case.set("one")
                
         # ----- case 1 : one dataset ----------------------------------------------------------------------
         fcase1 = Frame(frame, bd=1, relief='sunken')
@@ -287,140 +294,141 @@ class mainWindow(Tk):
         # button Research        
         self.c1Research = Button(fcase1, text=u"Research0", command=lambda case="one":self.AddRep(case), anchor='w', state=self.case1.get())
         self.c1Research.grid(column=1, row=2, sticky='sw')
-
-        # ----- case 2 : several datasets ------------------------------------------------------------------
-        fcase2 = Frame(frame, width=1000, height=50, bd=1, relief='sunken')
-        fcase2.grid(column=1, row=2, sticky='nsew')
-
-        # ----- Reference folder -----  
-        # title
-        self.refinstr1 = Label(fcase2, text="Select the root folder:", justify=LEFT, state=self.case2.get())
-        self.refinstr1.grid(column=0, row=0, sticky='w')
-        self.refinstr2 = Label(fcase2, text="Root folder contains all pathologies folders.", justify=LEFT, fg='#666666', state=self.case2.get())
-        self.refinstr2.grid(column=0, row=1, columnspan=2, sticky='w')
-        # reference folder
-        lf = Frame(fcase2)
-        lf.grid(column=0, row=2)
-        fbg = Frame(lf, background='#6699FF', bd=1)
-        fbg.grid(column=0, row=0)
-        self.reflb = Listbox(fbg, selectmode=SINGLE, bd=0, width=wi, height=1, bg="#BFCFFE", selectbackground="#BFCFFE", state=self.case2.get())
-        self.reflb.grid(column=0, row=0, sticky='w')
-        self.updateListbox("root")
-        scrx = Scrollbar(lf, command=self.reflb.xview, orient=HORIZONTAL)
-        scrx.grid(column=0, row=1, sticky='new')
-        self.reflb.config(xscrollcommand=scrx.set)
-        # button Research        
-        self.c2Research1 = Button(fcase2, text=u"Research", command=lambda case="root":self.AddRep(case), anchor='w', state=self.case2.get())
-        self.c2Research1.grid(column=1, row=2)
-
-        # ----- Pathologies folders -----
-        # title
-        self.pathoinstr1 = Label(fcase2, text="Select pathologies folders:", justify=LEFT, state=self.case2.get())
-        self.pathoinstr1.grid(column=0, row=4, sticky='nw')
-        self.pathoinstr2 = Label(fcase2, text="Pathology folder contains all patients folders.", justify=LEFT, fg='#666666', state=self.case2.get())
-        self.pathoinstr2.grid(column=0, row=5, columnspan=2, sticky='w')
-        # buttons
-        case1 = "pathology"
-        bf = Frame(fcase2)
-        bf.grid(column=1, row=6, sticky='nsew')
-        self.pathoadd = Button(bf, text=u"All folders", width=8, command=lambda x=case1:self.SelectAllRep(x), state=self.case2.get())
-        self.pathoadd.grid(column=0, row=0)
-        self.pathoch = Button(bf, text=u"Choose", width=8, command=lambda x=case1:self.AddRep(x), state=self.case2.get())
-        self.pathoch.grid(column=0, row=1)
-        self.pathomod = Button(bf, text=u"Modify", width=8, command=lambda x=case1:WinModifList(self, x), state=self.case2.get())
-        self.pathomod.grid(column=1, row=0)
-        self.pathoclr = Button(bf, text="Clear", width=8, command=lambda x=case1:self.ClearList(x), state=self.case2.get())
-        self.pathoclr.grid(column=1, row=1)
-        # folder(s) list
-        lf = Frame(fcase2)
-        lf.grid(column=0, row=6, sticky='nsew')
-        fbg = Frame(lf, background='#6699FF', bd=1)
-        fbg.grid(column=1, row=0, sticky='sew')
-        self.patholb = Listbox(fbg, selectmode=SINGLE, bd=0, width=wi, height=he, bg="#BFCFFE", selectbackground="#BFCFFE", state=self.case2.get())
-        self.patholb.grid(column=0, row=0, sticky='w')
-        self.patholbNb = Listbox(lf, selectmode=SINGLE, bg=self.DefClr, selectbackground=self.DefClr, width=3, height=he, bd=0)
-        self.patholbNb.grid(column=0, row=0, sticky='nse')
-        self.updateListbox("pathology")
-        scrx = Scrollbar(lf, command=self.patholb.xview, orient=HORIZONTAL)
-        scrx.grid(column=1, row=1, sticky='new')
-        self.patholb.config(xscrollcommand=scrx.set)
-        scry = Scrollbar(lf)
-        scry.grid(column=2, row=0, sticky='nsw')        
-        linkedListboxes(self.patholb, self.patholbNb, scry)
         
-        # ----- Patient folders -----
-        # title
-        self.patinstr1 = Label(fcase2, text="Select patients folders:", justify=LEFT, state=self.case2.get())
-        self.patinstr1.grid(column=0, row=7, sticky='nw')
-        self.patinstr2 = Label(fcase2, text="Patient folder contains all exam folders in sub-folder Original/.", justify=LEFT, fg='#666666', state=self.case2.get())
-        self.patinstr2.grid(column=0, row=8, columnspan=2, sticky='w')
-        # buttons
-        case2 = "patient"
-        bf = Frame(fcase2)
-        bf.grid(column=1, row=9, sticky='w')
-        self.patadd = Button(bf, text="All folders", width=8, command=lambda x=case2:self.SelectAllRep(x), state=self.case2.get())
-        self.patadd.grid(column=0, row=0)
-        self.patch = Button(bf, text=u"Choose", width=8, command=lambda x=case2:self.AddRep(x), state=self.case2.get())
-        self.patch.grid(column=0, row=1)
-        self.patmod = Button(bf, text=u"Modify", width=8, command=lambda x=case2:WinModifList(self, x), state=self.case2.get())
-        self.patmod.grid(column=1, row=0)
-        self.patclr = Button(bf, text="Clear", width=8, command=lambda x=case2:self.ClearList(x), state=self.case2.get())
-        self.patclr.grid(column=1, row=1)
-        # folder(s) list
-        lf = Frame(fcase2)
-        lf.grid(column=0, row=9, sticky='nsew')
-        fbg = Frame(lf, background='#6699FF', bd=1)
-        fbg.grid(column=1, row=0, sticky='sew')        
-        self.patlb = Listbox(fbg, selectmode=SINGLE, bd=0, width=wi, height=he, bg="#BFCFFE", selectbackground="#BFCFFE", state=self.case2.get())
-        self.patlb.grid(column=0, row=0, sticky='w')
-        self.patlbNb = Listbox(lf, selectmode=SINGLE, bg=self.DefClr, selectbackground=self.DefClr, width=3, height=he, bd=0)
-        self.patlbNb.grid(column=0, row=0, sticky='nse')
-        self.updateListbox("patient")
-        scrx = Scrollbar(lf, command=self.patlb.xview, orient=HORIZONTAL)
-        scrx.grid(column=1, row=1, sticky='new')
-        self.patlb.config(xscrollcommand=scrx.set)
-        scry = Scrollbar(lf)
-        scry.grid(column=2, row=0, sticky='nsw')        
-        linkedListboxes(self.patlb, self.patlbNb, scry)
-
-        # ----- Exam folders -----
-        # title
-        self.exinstr1 = Label(fcase2, text="Select examination folders:", justify=LEFT, state=self.case2.get())
-        self.exinstr1.grid(column=0, row=10, sticky='nw')
+        # ----- case 2 : several datasets ------------------------------------------------------------------
         if self.param["case"] == "functional":
-            exinstr2Text = "Exam folder is a sub-folder of Original/.\nIt contains folders Anat/ and Functional/."
-        else:
-            exinstr2Text = "Exam folder is a sub-folder of Original/."
-        self.exinstr2 = Label(fcase2, text=exinstr2Text, justify=LEFT, fg='#666666', state=self.case2.get())
-        self.exinstr2.grid(column=0, row=11, columnspan=2, sticky='w')
-        # buttons
-        case3 = "exam"
-        bf = Frame(fcase2)
-        bf.grid(column=1, row=12, sticky='w')
-        self.exadd = Button(bf, text="All folders", width=8, command=lambda x=case3:self.SelectAllRep(x), state=self.case2.get())
-        self.exadd.grid(column=0, row=0)
-        self.exch = Button(bf, text=u"Choose", width=8, command=lambda x=case3:self.AddRep(x), state=self.case2.get())
-        self.exch.grid(column=0, row=1)
-        self.exmod = Button(bf, text=u"Modify", width=8, command=lambda x=case3:WinModifList(self, x), state=self.case2.get())
-        self.exmod.grid(column=1, row=0)
-        self.exclr = Button(bf, text="Clear", width=8, command=lambda x=case3:self.ClearList(x), state=self.case2.get())
-        self.exclr.grid(column=1, row=1)
-        # folder(s) list
-        lf = Frame(fcase2)
-        lf.grid(column=0, row=12, sticky='nsew')
-        fbg = Frame(lf, background='#6699FF', bd=1)
-        fbg.grid(column=1, row=0, sticky='sew')
-        self.exlb = Listbox(fbg, selectmode=SINGLE, bd=0, width=wi, height=he, bg="#BFCFFE", selectbackground="#BFCFFE", state=self.case2.get())
-        self.exlb.grid(column=0, row=0, sticky='w')
-        self.exlbNb = Listbox(lf, selectmode=SINGLE, bg=self.DefClr, selectbackground=self.DefClr, width=3, height=he, bd=0)
-        self.exlbNb.grid(column=0, row=0, sticky='nse')        
-        self.updateListbox("exam")
-        scrx = Scrollbar(lf, command=self.exlb.xview, orient=HORIZONTAL)
-        scrx.grid(column=1, row=1, sticky='new')
-        self.exlb.config(xscrollcommand=scrx.set)
-        scry = Scrollbar(lf)
-        scry.grid(column=2, row=0, sticky='nsw')        
-        linkedListboxes(self.exlb, self.exlbNb, scry)        
+            fcase2 = Frame(frame, width=1000, height=50, bd=1, relief='sunken')
+            fcase2.grid(column=1, row=2, sticky='nsew')
+
+            # ----- Reference folder -----  
+            # title
+            self.refinstr1 = Label(fcase2, text="Select the root folder:", justify=LEFT, state=self.case2.get())
+            self.refinstr1.grid(column=0, row=0, sticky='w')
+            self.refinstr2 = Label(fcase2, text="Root folder contains all pathologies folders.", justify=LEFT, fg='#666666', state=self.case2.get())
+            self.refinstr2.grid(column=0, row=1, columnspan=2, sticky='w')
+            # reference folder
+            lf = Frame(fcase2)
+            lf.grid(column=0, row=2)
+            fbg = Frame(lf, background='#6699FF', bd=1)
+            fbg.grid(column=0, row=0)
+            self.reflb = Listbox(fbg, selectmode=SINGLE, bd=0, width=wi, height=1, bg="#BFCFFE", selectbackground="#BFCFFE", state=self.case2.get())
+            self.reflb.grid(column=0, row=0, sticky='w')
+            self.updateListbox("root")
+            scrx = Scrollbar(lf, command=self.reflb.xview, orient=HORIZONTAL)
+            scrx.grid(column=0, row=1, sticky='new')
+            self.reflb.config(xscrollcommand=scrx.set)
+            # button Research        
+            self.c2Research1 = Button(fcase2, text=u"Research", command=lambda case="root":self.AddRep(case), anchor='w', state=self.case2.get())
+            self.c2Research1.grid(column=1, row=2)
+
+            # ----- Pathologies folders -----
+            # title
+            self.pathoinstr1 = Label(fcase2, text="Select pathologies folders:", justify=LEFT, state=self.case2.get())
+            self.pathoinstr1.grid(column=0, row=4, sticky='nw')
+            self.pathoinstr2 = Label(fcase2, text="Pathology folder contains all patients folders.", justify=LEFT, fg='#666666', state=self.case2.get())
+            self.pathoinstr2.grid(column=0, row=5, columnspan=2, sticky='w')
+            # buttons
+            case1 = "pathology"
+            bf = Frame(fcase2)
+            bf.grid(column=1, row=6, sticky='nsew')
+            self.pathoadd = Button(bf, text=u"All folders", width=8, command=lambda x=case1:self.SelectAllRep(x), state=self.case2.get())
+            self.pathoadd.grid(column=0, row=0)
+            self.pathoch = Button(bf, text=u"Choose", width=8, command=lambda x=case1:self.AddRep(x), state=self.case2.get())
+            self.pathoch.grid(column=0, row=1)
+            self.pathomod = Button(bf, text=u"Modify", width=8, command=lambda x=case1:WinModifList(self, x), state=self.case2.get())
+            self.pathomod.grid(column=1, row=0)
+            self.pathoclr = Button(bf, text="Clear", width=8, command=lambda x=case1:self.ClearList(x), state=self.case2.get())
+            self.pathoclr.grid(column=1, row=1)
+            # folder(s) list
+            lf = Frame(fcase2)
+            lf.grid(column=0, row=6, sticky='nsew')
+            fbg = Frame(lf, background='#6699FF', bd=1)
+            fbg.grid(column=1, row=0, sticky='sew')
+            self.patholb = Listbox(fbg, selectmode=SINGLE, bd=0, width=wi, height=he, bg="#BFCFFE", selectbackground="#BFCFFE", state=self.case2.get())
+            self.patholb.grid(column=0, row=0, sticky='w')
+            self.patholbNb = Listbox(lf, selectmode=SINGLE, bg=self.DefClr, selectbackground=self.DefClr, width=3, height=he, bd=0)
+            self.patholbNb.grid(column=0, row=0, sticky='nse')
+            self.updateListbox("pathology")
+            scrx = Scrollbar(lf, command=self.patholb.xview, orient=HORIZONTAL)
+            scrx.grid(column=1, row=1, sticky='new')
+            self.patholb.config(xscrollcommand=scrx.set)
+            scry = Scrollbar(lf)
+            scry.grid(column=2, row=0, sticky='nsw')        
+            linkedListboxes(self.patholb, self.patholbNb, scry)
+
+            # ----- Patient folders -----
+            # title
+            self.patinstr1 = Label(fcase2, text="Select patients folders:", justify=LEFT, state=self.case2.get())
+            self.patinstr1.grid(column=0, row=7, sticky='nw')
+            self.patinstr2 = Label(fcase2, text="Patient folder contains all exam folders in sub-folder Original/.", justify=LEFT, fg='#666666', state=self.case2.get())
+            self.patinstr2.grid(column=0, row=8, columnspan=2, sticky='w')
+            # buttons
+            case2 = "patient"
+            bf = Frame(fcase2)
+            bf.grid(column=1, row=9, sticky='w')
+            self.patadd = Button(bf, text="All folders", width=8, command=lambda x=case2:self.SelectAllRep(x), state=self.case2.get())
+            self.patadd.grid(column=0, row=0)
+            self.patch = Button(bf, text=u"Choose", width=8, command=lambda x=case2:self.AddRep(x), state=self.case2.get())
+            self.patch.grid(column=0, row=1)
+            self.patmod = Button(bf, text=u"Modify", width=8, command=lambda x=case2:WinModifList(self, x), state=self.case2.get())
+            self.patmod.grid(column=1, row=0)
+            self.patclr = Button(bf, text="Clear", width=8, command=lambda x=case2:self.ClearList(x), state=self.case2.get())
+            self.patclr.grid(column=1, row=1)
+            # folder(s) list
+            lf = Frame(fcase2)
+            lf.grid(column=0, row=9, sticky='nsew')
+            fbg = Frame(lf, background='#6699FF', bd=1)
+            fbg.grid(column=1, row=0, sticky='sew')        
+            self.patlb = Listbox(fbg, selectmode=SINGLE, bd=0, width=wi, height=he, bg="#BFCFFE", selectbackground="#BFCFFE", state=self.case2.get())
+            self.patlb.grid(column=0, row=0, sticky='w')
+            self.patlbNb = Listbox(lf, selectmode=SINGLE, bg=self.DefClr, selectbackground=self.DefClr, width=3, height=he, bd=0)
+            self.patlbNb.grid(column=0, row=0, sticky='nse')
+            self.updateListbox("patient")
+            scrx = Scrollbar(lf, command=self.patlb.xview, orient=HORIZONTAL)
+            scrx.grid(column=1, row=1, sticky='new')
+            self.patlb.config(xscrollcommand=scrx.set)
+            scry = Scrollbar(lf)
+            scry.grid(column=2, row=0, sticky='nsw')        
+            linkedListboxes(self.patlb, self.patlbNb, scry)
+
+            # ----- Exam folders -----
+            # title
+            self.exinstr1 = Label(fcase2, text="Select examination folders:", justify=LEFT, state=self.case2.get())
+            self.exinstr1.grid(column=0, row=10, sticky='nw')
+            if self.param["case"] == "functional":
+                exinstr2Text = "Exam folder is a sub-folder of Original/.\nIt contains folders Anat/ and Functional/."
+            else:
+                exinstr2Text = "Exam folder is a sub-folder of Original/."
+            self.exinstr2 = Label(fcase2, text=exinstr2Text, justify=LEFT, fg='#666666', state=self.case2.get())
+            self.exinstr2.grid(column=0, row=11, columnspan=2, sticky='w')
+            # buttons
+            case3 = "exam"
+            bf = Frame(fcase2)
+            bf.grid(column=1, row=12, sticky='w')
+            self.exadd = Button(bf, text="All folders", width=8, command=lambda x=case3:self.SelectAllRep(x), state=self.case2.get())
+            self.exadd.grid(column=0, row=0)
+            self.exch = Button(bf, text=u"Choose", width=8, command=lambda x=case3:self.AddRep(x), state=self.case2.get())
+            self.exch.grid(column=0, row=1)
+            self.exmod = Button(bf, text=u"Modify", width=8, command=lambda x=case3:WinModifList(self, x), state=self.case2.get())
+            self.exmod.grid(column=1, row=0)
+            self.exclr = Button(bf, text="Clear", width=8, command=lambda x=case3:self.ClearList(x), state=self.case2.get())
+            self.exclr.grid(column=1, row=1)
+            # folder(s) list
+            lf = Frame(fcase2)
+            lf.grid(column=0, row=12, sticky='nsew')
+            fbg = Frame(lf, background='#6699FF', bd=1)
+            fbg.grid(column=1, row=0, sticky='sew')
+            self.exlb = Listbox(fbg, selectmode=SINGLE, bd=0, width=wi, height=he, bg="#BFCFFE", selectbackground="#BFCFFE", state=self.case2.get())
+            self.exlb.grid(column=0, row=0, sticky='w')
+            self.exlbNb = Listbox(lf, selectmode=SINGLE, bg=self.DefClr, selectbackground=self.DefClr, width=3, height=he, bd=0)
+            self.exlbNb.grid(column=0, row=0, sticky='nse')        
+            self.updateListbox("exam")
+            scrx = Scrollbar(lf, command=self.exlb.xview, orient=HORIZONTAL)
+            scrx.grid(column=1, row=1, sticky='new')
+            self.exlb.config(xscrollcommand=scrx.set)
+            scry = Scrollbar(lf)
+            scry.grid(column=2, row=0, sticky='nsw')        
+            linkedListboxes(self.exlb, self.exlbNb, scry)        
 
         # ----- Data processes -----------------------------------------------------------------------------
         self.fproc = Frame(frame, bd=1, relief='sunken')
@@ -823,7 +831,7 @@ class mainWindow(Tk):
                 elif e == "ok":
                     for p in self.examList:
                         self.param["examRep"] += [p]
-                    self.param["process"] = self.process
+                    self.param["process"] = self.process                    
                     self.destroy()
 
             # case 2: functional MRI
@@ -1552,7 +1560,7 @@ class WinSetCoord(Toplevel):
                         if self.master.allCoordFile.has_key(templBaseName):
                             tNameText = self.master.allCoordFile[templBaseName]
                         else:
-                            tNameText = "cool"#list2text(self.master.allProcessDict[f].template["name"])
+                            tNameText = self.master.param["repR"] + "/coord1.tt"#list2text(self.master.allProcessDict[f].template["name"])
                         self.coordFiles.update({templBaseName:StringVar()})
                         self.coordFiles[templBaseName].set(tNameText)
                         fbg = Frame(self,background=bgCol2, bd=1)
@@ -1587,7 +1595,7 @@ class WinSetCoord(Toplevel):
                     if self.master.allCoordFile.has_key(templBaseName):
                         tNameText = self.master.allCoordFile[templBaseName]
                     else:
-                        tNameText = "cool"#list2text(self.master.allProcessDict[f].template["name"])
+                        tNameText = self.master.param["repR"] + "/coord1.tt"#list2text(self.master.allProcessDict[f].template["name"])
                     self.coordFiles.update({templBaseName:StringVar()})
                     self.coordFiles[templBaseName].set(tNameText)
                     fbg = Frame(self,background=bgCol2, bd=1)
@@ -1621,7 +1629,7 @@ class WinSetCoord(Toplevel):
                     if self.master.allCoordFile.has_key(templBaseName):
                         tNameText = self.master.allCoordFile[templBaseName]
                     else:
-                        tNameText = "cool"#list2text(self.master.allProcessDict[f].template["name"])
+                        tNameText = self.master.param["repR"] + "/coord1.tt"#list2text(self.master.allProcessDict[f].template["name"])
                     self.coordFiles.update({templBaseName:StringVar()})
                     self.coordFiles[templBaseName].set(tNameText)
                     fbg = Frame(self,background=bgCol2, bd=1)
@@ -1646,7 +1654,7 @@ class WinSetCoord(Toplevel):
         if (fileName != "") and (fileName != ()):
             print fileName
             if sys.platform == "win32":
-                fileName = fileName.replace(" ","\n") # ¨¤ am¨¦liorer(quand il y a des espaces dans le nom de fichier)
+                fileName = fileName #nothing to do if Windows.
             else:
                 fileName = list2text(fileName)
             self.coordFiles[f].set(fileName)
@@ -1661,7 +1669,7 @@ class WinSetCoord(Toplevel):
                 self.master.allCoordFile[f] = self.coordFiles[f].get()
             else:
                 ok = False
-                tkMessageBox.showwarning(title="Warning", message= self.coordFiles[f].get()+ " is not a file")
+                tkMessageBox.showwarning(title="Warning", message= self.coordFiles[f].get()+ " is not a file .",parent= self)
 
         print self.master.allCoordFile
         if ok is True:

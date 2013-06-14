@@ -18,8 +18,9 @@ class allFunctions():
         self.graphComputing = graphComputing()
 
 ################## example for diffusion case
-        self.function1 = function1()
-        self.function2 = function2()
+        self.preprocess = preprocess()
+        self.register = register()
+        self.tbss = tbss()
 ####################
 
     def fctName(self, name):
@@ -387,20 +388,37 @@ class graphComputing():
             
 
 # # ---------------------------------------- ##
-class function1():
+class preprocess():
     def __init__(self):
-        self.name1 = "fonction 1"
-        self.name2 = "fonction1"
+        self.name1 = "Preprocess"
+        self.name2 = "preprocess"
         self.case = "diffusion"
+        self.nb = 0
         
 
     def run(self, param):
         print self.name1, 'run'
         
 # # ---------------------------------------- ##
-class function2():
+class register():
     def __init__(self):
-        self.name1 = "fonction 2"
-        self.name2 = "fonction2"
+        self.name1 = "Register"
+        self.name2 = "register"
         self.case = "diffusion"
+        self.nb = 1
+        
+    def run(self, param):
+        print self.name1, 'run'
+        
+        
+# # ---------------------------------------- ##
+class tbss():
+    def __init__(self):
+        self.name1 = "TBSS"
+        self.name2 = "tbss"
+        self.case = "diffusion"
+        self.nb = 2
+        
+    def run(self, param):
+        print self.name1, 'run'
 

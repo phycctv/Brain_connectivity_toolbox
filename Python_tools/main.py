@@ -114,7 +114,7 @@ if "process" in param :
     print "3. Data processing"
 
     for p in param["process"]:
-
+#-------------------------------Functional-----------------------------------------#
         # ---------------------- PREPROCESSING -------------------------------- #
         if p == "data preprocessing":
             from functionsInfo import dataPreprocessing
@@ -139,8 +139,20 @@ if "process" in param :
             from functionsInfo import graphComputing
             GC = graphComputing(**param)
             GC.run()
-
-
+#-------------------------------Diffusion-----------------------------------------#
+        # ---------------------- preprocess ----------------------------------- #
+        elif p == "Preprocess":
+            from functionsInfo import preprocess 
+            preprocDif = preprocess()
+            preprocDif.run(param)
+        elif p == "Register":
+            from functionsInfo import register 
+            reg = register()
+            reg.run(param)
+        elif p == "TBSS":
+            from functionsInfo import tbss 
+            TB = tbss()
+            TB.run(param)
     ##### add new function in this part: create instance related to this function and run it
     ##### warning: functions are run in order of appearance in param["process"]  
 
