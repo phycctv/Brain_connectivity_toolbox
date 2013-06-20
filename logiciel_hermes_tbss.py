@@ -52,7 +52,7 @@ for o, a in opts:
     if o in ("-h", "--help"):
         # On affiche l'aide
         print('Help of the DTI prepocessing:')
-        print('* means that no parameter is needed \n')
+        print('* means that parameter is needed \n')
         print('     -h , --help: print the help')
         print('     -t , --temoin *: Directory for the first group')        
         print('     -p,  --patient *: Directory for the second group' )

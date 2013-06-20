@@ -53,8 +53,8 @@ def settings():
         lines = configFile.readlines()
         find = False
         for line in lines:
-            if "matlabPath:" in line:
-                matPath = line.split(":")[1]
+            if "matlabPath=" in line:
+                matPath = line.split("=")[1]
                 if os.path.isfile(matPath[0:-1]+"matlab"):
                     param["matlabPath"]=matPath[0:-1]
                     find = True
@@ -148,7 +148,7 @@ def searchMatlab():
             # If found matlab, save it in file "Config"
             if f is True:
                 configFile = open("Config.txt", "w")
-                configFile.write("matlabPath:"+matlabPath+"\n")
+                configFile.write("matlabPath="+matlabPath+"\n")
                 configFile.close()
                 print("---Matlab found--- \n OK")
             else:

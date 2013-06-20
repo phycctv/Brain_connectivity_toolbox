@@ -97,8 +97,10 @@ class mainWindow(Tk):
     If data preprocessing is chosen, user preprocessing steps are chosen in a new window, see class WinChooseProcess
     in this module. It is also possible to set SPM reference files (templates and atlases) with class WinCheckTempl.
     
-    If case is "diffusion", process step are those given in module functionsInfo.py, whom attribute "case" is "diffusion".
-        
+    If case is "diffusion", process steps are:
+        - preprocess
+        - register
+        - TBSS
         
 ********************************************************        
         
@@ -292,7 +294,7 @@ class mainWindow(Tk):
         scrx.grid(column=0, row=3, sticky='new')
         self.c1dir.config(xscrollcommand=scrx.set)
         # button Research        
-        self.c1Research = Button(fcase1, text=u"Research0", command=lambda case="one":self.AddRep(case), anchor='w', state=self.case1.get())
+        self.c1Research = Button(fcase1, text=u"Research", command=lambda case="one":self.AddRep(case), anchor='w', state=self.case1.get())
         self.c1Research.grid(column=1, row=2, sticky='sw')
         
         # ----- case 2 : several datasets ------------------------------------------------------------------
@@ -436,6 +438,8 @@ class mainWindow(Tk):
         self.processChoice()
         if self.param["case"] == "functional":
             self.coordChoice()
+        elif self.param["case"] == "diffusion":
+            self.optionChoice()
                 
         # ----- Quit ---------------------------------------------------------------------------------------
         fquit = Frame(frame)
@@ -528,16 +532,92 @@ class mainWindow(Tk):
             self.preprocR2.select()
             self.preprocR1.grid(column=1, row=0)
             self.preprocR2.grid(column=2, row=0)
-
-    def coordChoice(self):
+            
+    def coordChoice(self): 
+        """
+            Frame for choice coordonate files for Graph Computing (part functionnal)
+        
+        """
         fdetails2 = Frame(self.fproc, bd=1, relief='sunken')
         fdetails2.grid(column=3, row=1, sticky='nse')
         self.coordChoiceTitle = Label(fdetails2, text="Set Coordinates file(s) \n for each template \n(for Graph computing)", state=self.procState.get())
         self.coordChoiceTitle.grid(column=3, row=3, sticky='nsw')
         self.coordButton = Button(fdetails2, text=u"click here", command=self.defineCoord, state=self.procState.get())
         self.coordButton.grid(column=3, row=4)
-    def updateFctList(self):
+    def optionChoice(self): 
+        """
+            Frame for choice options for 3 steps of processing (part diffusion)
         
+        """
+        self.optionsPreproc = list()
+        self.optionsPreproc = ['--load','--grad','--eddy','--mask','--erosion','--trackvis','--dti']
+        self.optionsReg = list()
+        self.optionsReg = ['--template','--reglin','--Regnonlin','--applywarp']
+        self.optionsTBSS = list()
+        self.optionsTBSS = ['--temoin','--patient','--dir','--mask','--erosion','--trackvis','--dti']
+        def winHelpPreproc (self):
+            tkMessageBox.showinfo(title="Help for Preprocess", message="\
+--load\t: transform the dicom into nifti via dcm2nii.\n\
+--grad\t: Apply correction to the gradient. \n\
+--eddy\t: Apply Eddy current correction on DWIs  \n\
+--mask\t: Apply BET algorithm to estimate mask \n\
+--erosion\t: Apply erosion on the current mask \n\
+--trackvis\t: Repertory of the trackvis and dtk \n\
+--dti\t: Estimate the coefficients FA, MD, eigen values and vectors with Trackvis")
+        def winHelpReg (self):
+            tkMessageBox.showinfo(title="Help for Register", message="\
+--template\t: Add a template for FA registration. \n\
+--reglin\t\t: Linear registration. \n\
+--Regnonlin\t: Non linear registration. \n\
+--applywarp\t: Apply warp on the FA images")
+        def winHelpTBSS (self):
+            tkMessageBox.showinfo(title="Help for TBSS", message="\
+--temoin\t: Directory for the first group. \n\
+--patient\t: Directory for the second group. \n\
+--dir\t: Directory for the TBSS group (copy the necessary data in this directory). \n\
+--Dir\t: Directory for the TBSS group (no data copy). \n\
+--tbss_1\t:  First step of TBSS. \n\
+--tbss_2\t:  Second step of TBSS. \n\
+--tbss_3\t:  Third step of TBSS. \n\
+--tbss_4\t:  Fourth step of TBSS")
+            
+        fdetailsPreproc = Frame(self.fproc, bd=1, relief='sunken')
+        fdetailsPreproc.grid(column=3, row=1, sticky='nse')
+        fdetailsReg = Frame(self.fproc, bd=1, relief='sunken')
+        fdetailsReg.grid(column=5, row=1, sticky='nse')
+        fdetailsTBSS = Frame(self.fproc, bd=1, relief='sunken')
+        fdetailsTBSS.grid(column=7, row=1, sticky='nse')
+        self.preprocTitle = Label(fdetailsPreproc, text="Options for Preprocess", state=self.procState.get())
+        self.preprocTitle.grid(column=0, row=0, columnspan=2, sticky='nsw')
+        self.preprocTitle.bind('<Button-1>',  winHelpPreproc)  
+        self.regTitle = Label(fdetailsReg, text="Options for Register", state=self.procState.get())
+        self.regTitle.grid(column=0, row=0, columnspan=2, sticky='nsw')
+        self.regTitle.bind('<Button-1>',  winHelpReg) 
+        self.tbssTitle = Label(fdetailsTBSS, text="Options for TBSS", state=self.procState.get())
+        self.tbssTitle.grid(column=0, row=0, columnspan=2, sticky='nsw')
+        self.tbssTitle.bind('<Button-1>',  winHelpTBSS) 
+        self.chosenOptPreproc = list()
+        self.preprocWidget = list()
+        self.chosenOptReg = list()
+        self.regWidget = list()
+        self.chosenOptTBSS = list()
+        self.tbssWidget = list()
+        for i,f in enumerate(self.optionsPreproc):
+            self.chosenOptPreproc.insert(i, IntVar())
+            self.preprocWidget.insert(i , Checkbutton(fdetailsPreproc, text=f, variable=self.chosenOptPreproc[i], command=self.updateFctList,state=self.procState.get()))
+            self.preprocWidget[i].grid(column=1, row=i + 2, sticky='nsw')
+        for i,f in enumerate(self.optionsReg):
+            self.chosenOptReg.insert(i, IntVar())
+            self.regWidget.insert(i, Checkbutton(fdetailsReg, text=f, variable=self.chosenOptReg[i], command=self.updateFctList,state=self.procState.get()))
+            self.regWidget[i].grid(column=1, row=i + 2, sticky='nsw')
+        for i,f in enumerate(self.optionsTBSS):
+            self.chosenOptTBSS.insert(i, IntVar())
+            self.tbssWidget.insert(i, Checkbutton(fdetailsTBSS, text=f, variable=self.chosenOptTBSS[i], command=self.updateFctList,state=self.procState.get()))
+            self.tbssWidget[i].grid(column=1, row=i + 2, sticky='nsw')
+    
+
+    def updateFctList(self):
+
         self.process = list()
         if self.chosenFct[0].get() == 1:
             for i, f in enumerate(self.fctList):
@@ -571,6 +651,30 @@ class mainWindow(Tk):
                     
                 self.coordChoiceTitle.config(state=self.procState.get())
                 self.coordButton.config(state=self.procState.get())
+            if self.fctList[i] == "Preprocess":
+                if self.chosenFct[i + 1].get() == 1:
+                    self.procState.set("normal")
+                else:
+                    self.procState.set("disable")
+                self.preprocTitle.config(state=self.procState.get())
+                for c in self.preprocWidget:
+                    c.config(state=self.procState.get())
+            if self.fctList[i] == "Register":
+                if self.chosenFct[i + 1].get() == 1:
+                    self.procState.set("normal")
+                else:
+                    self.procState.set("disable")
+                self.regTitle.config(state=self.procState.get())
+                for c in self.regWidget:
+                    c.config(state=self.procState.get())
+            if self.fctList[i] == "TBSS":
+                if self.chosenFct[i + 1].get() == 1:
+                    self.procState.set("normal")
+                else:
+                    self.procState.set("disable")
+                self.tbssTitle.config(state=self.procState.get())
+                for c in self.tbssWidget:
+                    c.config(state=self.procState.get())
     def scrollWindow(self, event):
         """ Vertical scrolling window with mouse wheel.
         /!\ to be tested for windows        """
@@ -797,6 +901,7 @@ class mainWindow(Tk):
                                             Each element of list param["allProcessInfo"] is related to a path in param["examRep"].
                                             Keys of i-th dictionary param["allProcessInfo"][i] are functions names of list param["allProcess"].
                                             Content of this dictionary is a SPMfct object (see class SPMfct in module matlabFct), updated with information about the dataset (i-th path of param["examRep"]) and each function;
+                - param["allCoordFile"]     Dictionary of Coordinate file for graph computing
                 - param["run"]              list of dictionary of boolean values, same structure as param["allProcessInfo"];
                                             Each element of list param["run"] is related to a path in param["examRep"].
                                             Keys of i-th dictionary param["run"][i] are functions names of list param["allProcess"].
@@ -1525,7 +1630,17 @@ Warning : all changes done in reference files with this class are lost when user
             self.master.allProcessDict[f].template["name"] = self.templName[i].get().split("\n")
         self.destroy()
 class WinSetCoord(Toplevel):
-    
+    """ Open new window to check or modify SPM reference files for each chosen function.
+
+    .
+
+    Attributes:
+        - master        object class mainWindow;
+        - templName     list of string: for function i, templName[i] gives files list in text format ('\n' between files names).
+                        templName[i] is a variable string;
+        - Tkinter attributes.
+    """
+
     def __init__(self, master):
         Toplevel.__init__(self, master)
         self.master = master

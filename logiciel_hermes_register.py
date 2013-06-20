@@ -58,13 +58,13 @@ for o, a in opts:
     elif o in ("-h", "--help"):
         # On affiche l'aide
         print('Help of the DTI prepocessing:')
-        print('* means that no parameter is needed \n')
+        print('* means that parameter is needed \n')
         print('     -h , --help: print the help')
         print('     -d , --dir *: Source directory (MUST be set)')        
         print('     -t,  --template *: Add a template for FA registration' )
         print('     -r , --reglin : Linear registration ')
         print('     -R , --Regnonlin : Non linear registration' )
-        print('     -a , --applywarp *: Apply warp on the FA images ')        
+        print('     -a , --applywarp : Apply warp on the FA images ')        
         sys.exit()
 
 

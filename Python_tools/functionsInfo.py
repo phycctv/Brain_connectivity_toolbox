@@ -209,6 +209,8 @@ class TSExtraction():
 
         if "repR" in param:
             self.repR = param["repR"]
+        if "overwrite" in param:
+            self.overwrite = param["overwrite"]
         self.dataset = list()
         self.resultRep = list()
         self.rep = list()
@@ -274,7 +276,7 @@ class TSExtraction():
                     if sys.platform == "win32":
                         templBaseName = templBaseName.replace('\\','/')
                     templBaseName = templBaseName.split("/")[-1].split("_u_rc")[0].replace("natw","")
-                    if not os.path.isfile(self.rep[i] + "corrected_data/"+ templBaseName + "/func_ROI_" + templBaseName + "_ts.txt"):
+                    if not os.path.isfile(self.rep[i] + "corrected_data/"+ templBaseName + "/func_ROI_" + templBaseName + "_ts.txt") or self.overwrite == "y":
                         print self.rep[i] + "corrected_data/"+"func_ROI_" + templBaseName + "_ts.txt"
                         print "For template : " + templBaseName + "..."
                         r = robjects.r

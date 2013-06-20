@@ -1,0 +1,50 @@
+Wednesday 19 June 2013 15:29
+
+Parameters set with GUI.
+Functional fMRI data processed.
+Overwrite existing files: y
+
+Chosen functions:
+	data preprocessing
+	quality check
+	time series extraction
+	graph computing
+
+Data folders:
+1. C:/Users/phycctv/Documents/NetBeansProjects/rootPatient/Patient/Patient1/Original/Exam0
+
+Overwrite existing files: y
+
+Chosen SPM functions - reference file in SPM:
+	realign	-	 
+	segment	-	C:/Users/phycctv/Documents/NetBeansProjects/spm8/toolbox/Seg/TPM.nii 
+	normalize	-	C:/Users/phycctv/Documents/NetBeansProjects/spm8/toolbox/AtlasMNI/TemGraph1_1.5.img C:/Users/phycctv/Documents/NetBeansProjects/spm8/toolbox/AtlasMNI/TemGraph2_1.5.img C:/Users/phycctv/Documents/NetBeansProjects/spm8/toolbox/AtlasMNI/TemGraph3_1.5.img C:/Users/phycctv/Documents/NetBeansProjects/spm8/toolbox/AtlasMNI/TemGraph4_1.5.img C:/Users/phycctv/Documents/NetBeansProjects/spm8/toolbox/AtlasMNI/TemGraph5_1.5.img C:/Users/phycctv/Documents/NetBeansProjects/spm8/toolbox/AtlasMNI/TemGraph6_1.5.img 
+	warp	-	 
+	iwarp	-	C:/Users/phycctv/Documents/NetBeansProjects/spm8/toolbox/AtlasMNI/ROI_MNI_V4.nii 
+	coregister	-	C:/Users/phycctv/Documents/NetBeansProjects/spm8/toolbox/AtlasMNI/ROI_MNI_V4.nii 
+	coregister_interp	-	 
+	iwarp_finergrid	-	C:/Users/phycctv/Documents/NetBeansProjects/spm8/toolbox/Atlas/Template.nii 
+	coregister_finergrid	-	C:/Users/phycctv/Documents/NetBeansProjects/spm8/toolbox/Atlas/Template.nii 
+
+Functions status:
+	- realign	run
+	- segment	run
+	- normalize	run
+	- warp	run
+	- iwarp	run
+	- coregister	run
+	- coregister_interp	run
+	- iwarp_finergrid	run
+	- coregister_finergrid	run
+
+Preprocessing for data in C:/Users/phycctv/Documents/NetBeansProjects/rootPatient/Patient/Patient1/Original/Exam0/
+	-> matlab script: C:/Users/phycctv/Documents/NetBeansProjects/rootPatient/Patient/Patient1/Processed/Exam0/Jobs/preprocessing_2013_06_19_15h29.m.
+
+Preprocessing done - 15:42:02
+Quality check done - 15:42:07
+	next step for data sets:
+	C:/Users/phycctv/Documents/NetBeansProjects/rootPatient/Patient/Patient1/Original/Exam0
+Time series extraction done - 15:57:31
+Graph computing done - 15:59:04
+
+End - 15:59
