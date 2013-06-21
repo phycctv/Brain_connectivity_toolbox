@@ -1,0 +1,13 @@
+Friday 21 June 2013 16:51
+
+Parameters set with GUI.
+Diffusion fMRI data processed.
+
+Chosen functions:
+	Preprocess
+
+Data folders:
+1. C:/Users/phycctv/.VirtualBox
+
+
+End - 16:51

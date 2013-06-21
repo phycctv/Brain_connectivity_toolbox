@@ -1,0 +1,14 @@
+Friday 21 June 2013 16:01
+
+Parameters set with GUI.
+Diffusion fMRI data processed.
+
+Chosen functions:
+	TBSS
+
+Data folders:
+1. C:/Users/phycctv/.swt
+2. C:/Users/phycctv/.matplotlib
+
+
+End - 16:01

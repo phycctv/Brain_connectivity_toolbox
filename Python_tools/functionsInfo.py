@@ -400,6 +400,17 @@ class preprocess():
 
     def run(self, param):
         print self.name1, 'run'
+        import subprocess
+        for rep in param["examRep"]:
+            print "For dataset: " + rep
+            cmd = "python " + param["repPyTools"] + "/logiciel_hermes_preprocess.py --dir " + rep
+            for opt in param["preprocOptList"]:
+                cmd = cmd + " " + opt
+                if opt == "--trackvis":
+                    cmd = cmd + " " + param["repTrackV"]
+            print "Preprocess script running at " + strftime("%H:%M:%S")
+            prep = subprocess.Popen(cmd, shell=True)  # display  messages on shell
+            stdoutdata, stderrdata = prep.communicate()
         
 # # ---------------------------------------- ##
 class register():
@@ -411,7 +422,18 @@ class register():
         
     def run(self, param):
         print self.name1, 'run'
-        
+        import subprocess
+        for rep in param["examRep"]:
+            print "For dataset: " + rep
+            cmd = "python " + param["repPyTools"] + "/logiciel_hermes_register.py --dir " + rep
+            for opt in param["regOptList"]:
+                cmd = cmd + " " + opt
+                if opt == "--template":
+                    cmd = cmd + " " + param["fileTemplate"]
+            print "Register script running at " + strftime("%H:%M:%S")
+            print cmd
+            prep = subprocess.Popen(cmd, shell=True)  # display  messages on shell
+            stdoutdata, stderrdata = prep.communicate()
         
 # # ---------------------------------------- ##
 class tbss():
@@ -423,4 +445,14 @@ class tbss():
         
     def run(self, param):
         print self.name1, 'run'
-
+        import subprocess
+        cmd = "python " + param["repPyTools"] + "/logiciel_hermes_tbss.py --temoin " + param["examRep"][0] + " --patient " + param["examRep"][1]
+        for opt in param["tbssOptList"]:
+            cmd = cmd + " " + opt
+            if opt == "--dir":
+                    cmd = cmd + " " + param["repTbssGroupeCopy"]
+            elif opt == "--Dir":
+                    cmd = cmd + " " + param["repTbssGroupeNoCopy"]
+        print "Tbss script running at " + strftime("%H:%M:%S")
+        prep = subprocess.Popen(cmd, shell=True)  # display  messages on shell
+        stdoutdata, stderrdata = prep.communicate()

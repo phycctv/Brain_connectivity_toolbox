@@ -1,0 +1,15 @@
+Friday 21 June 2013 15:20
+
+Parameters set with GUI.
+Diffusion fMRI data processed.
+
+Chosen functions:
+	Preprocess
+	Register
+	TBSS
+
+Data folders:
+1. C:/Users/phycctv/Documents/NetBeansProjects/rootPatient/Patient/Patient1/Original/Exam0
+
+
+End - 15:21

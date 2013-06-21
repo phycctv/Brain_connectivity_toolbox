@@ -1,0 +1,14 @@
+Friday 21 June 2013 17:21
+
+Parameters set with GUI.
+Diffusion fMRI data processed.
+
+Chosen functions:
+	TBSS
+
+Data folders:
+1. C:/Users/phycctv/.VirtualBox
+2. C:/Users/phycctv/AppData
+
+
+End - 17:22

@@ -72,7 +72,7 @@ def settings():
         matlabPath=searchMatlab()
         if matlabPath is not None:
             param["matlabPath"] = matlabPath
-
+    param["repPyTools"] = sourcePath.replace('\\','/')
     param["repSPM"] = os.path.realpath(sourcePath +"/../../spm8/").replace('\\','/')
     param["repTools"] = os.path.realpath(sourcePath +"/../Matlab_tools/preproc_SPM8/").replace('\\','/')
     param["repR"] = os.path.realpath(sourcePath +"/../R_tools/").replace('\\','/')

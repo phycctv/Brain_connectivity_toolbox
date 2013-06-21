@@ -8,6 +8,7 @@
 #   - WinModifList
 #   - WinChooseProcess
 #   - WinCheckTempl
+#   - WinSetCoord
 
 
 from Tkinter import *
@@ -213,7 +214,11 @@ class mainWindow(Tk):
         self.procState.set("disable")
         self.param = param        
         self.initialize(master)
-                
+        # options diffusion
+        self.preprocOptList = list()    # for option preprocss
+        self.regOptList = list()        # for option register
+        self.tbssOptList = list()       # for option TBSS
+        #
     def initialize(self, master):
         """ Display main window.
 
@@ -296,7 +301,26 @@ class mainWindow(Tk):
         # button Research        
         self.c1Research = Button(fcase1, text=u"Research", command=lambda case="one":self.AddRep(case), anchor='w', state=self.case1.get())
         self.c1Research.grid(column=1, row=2, sticky='sw')
-        
+        if self.param["case"] == "diffusion":
+            fcaseD2 = Frame(frame, bd=1, relief='sunken')
+            fcaseD2.grid(column=1, row=2, sticky='nsew')
+            self.c1instrD2 = Label(fcaseD2, text="Select the 2nd Group:(for patient)", justify=LEFT, state=self.procState.get())
+            self.c1instrD2.grid(column=0, row=0, sticky='nw')
+            c1instr2TextD2 = "Exam folder is a sub-folder of Original/."
+            self.c1instr2D2 = Label(fcaseD2, text=c1instr2Text, justify=LEFT, fg='#666666', state=self.procState.get())
+            self.c1instr2D2.grid(column=0, row=1, columnspan=2, sticky='nw')
+            # examination folder in listbox
+            fbgD2 = Frame(fcaseD2, background='#6699FF', bd=1)
+            fbgD2.grid(column=0, row=2, sticky='sew')
+            self.c1dirD2 = Listbox(fbgD2, selectmode=SINGLE, bd=0, width=wi, bg="#BFCFFE", selectbackground="#BFCFFE", state=self.procState.get(), height=1)
+            self.c1dirD2.grid(column=0, row=0)
+            list2listbox(self.c1dirD2, self.examList)
+            scrxD2 = Scrollbar(fcaseD2, command=self.c1dirD2.xview, orient=HORIZONTAL)
+            scrxD2.grid(column=0, row=3, sticky='new')
+            self.c1dirD2.config(xscrollcommand=scrx.set)
+            # button Research        
+            self.c1ResearchD2 = Button(fcaseD2, text=u"Research", command=lambda case="one":self.AddRepD2(), anchor='w', state=self.procState.get())
+            self.c1ResearchD2.grid(column=1, row=2, sticky='sw')
         # ----- case 2 : several datasets ------------------------------------------------------------------
         if self.param["case"] == "functional":
             fcase2 = Frame(frame, width=1000, height=50, bd=1, relief='sunken')
@@ -554,7 +578,7 @@ class mainWindow(Tk):
         self.optionsReg = list()
         self.optionsReg = ['--template','--reglin','--Regnonlin','--applywarp']
         self.optionsTBSS = list()
-        self.optionsTBSS = ['--temoin','--patient','--dir','--mask','--erosion','--trackvis','--dti']
+        self.optionsTBSS = ['--dir','--Dir','--tbss_1','--tbss_2','--tbss_3','--tbss_4']
         def winHelpPreproc (self):
             tkMessageBox.showinfo(title="Help for Preprocess", message="\
 --load\t: transform the dicom into nifti via dcm2nii.\n\
@@ -572,8 +596,6 @@ class mainWindow(Tk):
 --applywarp\t: Apply warp on the FA images")
         def winHelpTBSS (self):
             tkMessageBox.showinfo(title="Help for TBSS", message="\
---temoin\t: Directory for the first group. \n\
---patient\t: Directory for the second group. \n\
 --dir\t: Directory for the TBSS group (copy the necessary data in this directory). \n\
 --Dir\t: Directory for the TBSS group (no data copy). \n\
 --tbss_1\t:  First step of TBSS. \n\
@@ -602,20 +624,64 @@ class mainWindow(Tk):
         self.regWidget = list()
         self.chosenOptTBSS = list()
         self.tbssWidget = list()
+        def updatePreprocOptList():
+            self.preprocOptList = list()
+            for i, f in enumerate(self.optionsPreproc):
+                if self.chosenOptPreproc[i].get() == 1:
+                    self.preprocOptList += [f]
+            print self.preprocOptList
+        def updateRegOptList():
+            self.regOptList = list()
+            for i, f in enumerate(self.optionsReg):
+                if self.chosenOptReg[i].get() == 1:
+                    self.regOptList += [f]
+            print self.regOptList
+        def updateTbssOptList():
+            self.tbssOptList = list()
+            for i, f in enumerate(self.optionsTBSS):
+                if self.chosenOptTBSS[i].get() == 1:
+                    self.tbssOptList += [f]
+            print self.tbssOptList
         for i,f in enumerate(self.optionsPreproc):
             self.chosenOptPreproc.insert(i, IntVar())
-            self.preprocWidget.insert(i , Checkbutton(fdetailsPreproc, text=f, variable=self.chosenOptPreproc[i], command=self.updateFctList,state=self.procState.get()))
+            self.preprocWidget.insert(i , Checkbutton(fdetailsPreproc, text=f, variable=self.chosenOptPreproc[i], command=updatePreprocOptList,state=self.procState.get()))
             self.preprocWidget[i].grid(column=1, row=i + 2, sticky='nsw')
+            if f == "--trackvis": 
+                # change
+                def setRepTrackV():
+                    self.param["repTrackV"] = tkFileDialog.askdirectory(parent=self,initialdir="~/", title='Please select a directory for TrackVis:')
+                self.butSetRepTrackV = Button(fdetailsPreproc, text=u"Set directory", command=setRepTrackV, anchor='w', state=self.procState.get()) 
+                self.butSetRepTrackV.grid(column=2, row=i + 2)
+                            
         for i,f in enumerate(self.optionsReg):
             self.chosenOptReg.insert(i, IntVar())
-            self.regWidget.insert(i, Checkbutton(fdetailsReg, text=f, variable=self.chosenOptReg[i], command=self.updateFctList,state=self.procState.get()))
+            self.regWidget.insert(i, Checkbutton(fdetailsReg, text=f, variable=self.chosenOptReg[i], command=updateRegOptList,state=self.procState.get()))
             self.regWidget[i].grid(column=1, row=i + 2, sticky='nsw')
+            if f == "--template": 
+                # change
+                def setFileTemplate():
+                    self.param["fileTemplate"] = tkFileDialog.askopenfilename(parent=self,initialdir="~/", title='Please select a template')
+                self.butSetFileTemplate = Button(fdetailsReg, text=u"Set template", command=setFileTemplate, anchor='w', state=self.procState.get()) 
+                self.butSetFileTemplate.grid(column=2, row=i + 2)
+                
         for i,f in enumerate(self.optionsTBSS):
             self.chosenOptTBSS.insert(i, IntVar())
-            self.tbssWidget.insert(i, Checkbutton(fdetailsTBSS, text=f, variable=self.chosenOptTBSS[i], command=self.updateFctList,state=self.procState.get()))
+            self.tbssWidget.insert(i, Checkbutton(fdetailsTBSS, text=f, variable=self.chosenOptTBSS[i], command=updateTbssOptList,state=self.procState.get()))
             self.tbssWidget[i].grid(column=1, row=i + 2, sticky='nsw')
-    
+            if f == "--dir": 
+                # change
+                def setTbssGroupeCopy():
+                    self.param["repTbssGroupeCopy"] = tkFileDialog.askdirectory(parent=self,initialdir="~/", title='Please select a directory for the TBSS group (copy the necessary data in this directory).')
+                self.butSetTbssGroupeCopy = Button(fdetailsTBSS, text=u"Set directory", command=setTbssGroupeCopy, anchor='w', state=self.procState.get()) 
+                self.butSetTbssGroupeCopy.grid(column=2, row=i + 2)
+            elif f == "--Dir": 
+                # change
+                def setTbssGroupeNoCopy():
+                    self.param["repTbssGroupeNoCopy"] = tkFileDialog.askdirectory(parent=self,initialdir="~/", title='Please select a directory for the TBSS group (no data copy).')
+                self.butSetTbssGroupeNoCopy = Button(fdetailsTBSS, text=u"Set directory", command=setTbssGroupeNoCopy, anchor='w', state=self.procState.get()) 
+                self.butSetTbssGroupeNoCopy.grid(column=2, row=i + 2)
 
+            
     def updateFctList(self):
 
         self.process = list()
@@ -656,6 +722,7 @@ class mainWindow(Tk):
                     self.procState.set("normal")
                 else:
                     self.procState.set("disable")
+                self.butSetRepTrackV.config(state=self.procState.get())
                 self.preprocTitle.config(state=self.procState.get())
                 for c in self.preprocWidget:
                     c.config(state=self.procState.get())
@@ -664,6 +731,7 @@ class mainWindow(Tk):
                     self.procState.set("normal")
                 else:
                     self.procState.set("disable")
+                self.butSetFileTemplate.config(state=self.procState.get())
                 self.regTitle.config(state=self.procState.get())
                 for c in self.regWidget:
                     c.config(state=self.procState.get())
@@ -672,6 +740,12 @@ class mainWindow(Tk):
                     self.procState.set("normal")
                 else:
                     self.procState.set("disable")
+                self.butSetTbssGroupeNoCopy.config(state=self.procState.get())
+                self.butSetTbssGroupeCopy.config(state=self.procState.get())
+                self.c1instrD2.config(state=self.procState.get())
+                self.c1instr2D2.config(state=self.procState.get())
+                self.c1dirD2.config(state=self.procState.get())
+                self.c1ResearchD2.config(state=self.procState.get())
                 self.tbssTitle.config(state=self.procState.get())
                 for c in self.tbssWidget:
                     c.config(state=self.procState.get())
@@ -792,18 +866,29 @@ class mainWindow(Tk):
             Otherwise the new window is a WinChooseRep object.
             In all cases, the listbox corresponding to the case is updated with new folders list."""        
         if self.case.get() == "one":
-            t = tkFileDialog.askdirectory(parent=self.master, initialdir="~/Documents/NetBeansProjects/rootPatient/Patient/Patient1/Original/Exam0", title='Please select a directory')
+            t = tkFileDialog.askdirectory(parent=self.master, initialdir="~/", title='Please select a directory')
             if t != "":
                 del self.examList
                 self.examList = list()
                 self.examList.insert(0, t)
                 list2listbox(self.c1dir, self.examList)
         elif case == "root":
-            self.rootRep.set(tkFileDialog.askdirectory(parent=self.master, initialdir="~/Documents/", title='Please select a directory'))
+            self.rootRep.set(tkFileDialog.askdirectory(parent=self.master, initialdir="~/", title='Please select a directory'))
             self.updateListbox("root")
         else:
             WinChooseRep(self, case)
-
+    def AddRepD2(self):
+        if len(self.examList) >= 1:
+            t = tkFileDialog.askdirectory(parent=self.master, initialdir="~/", title='Please select a directory')
+            if t != "":
+                dir1 = self.examList[0]
+                del self.examList
+                self.examList = list()
+                self.examList.insert(0, dir1)
+                self.examList.insert(1, t)
+                list2listbox(self.c1dirD2, self.examList[1:])
+        else:
+            tkMessageBox.showwarning(title="Warning", message="Please give the first group at first")
     def updateListbox(self, case):
         """ Update folders or functions names lists and numbering in window, depending on entry "case"."""
         if case == "pathology":
@@ -926,18 +1011,30 @@ class mainWindow(Tk):
             # case 1: diffusion MRI
             # exam folders have to be in folder called Original
             if self.param["case"] == "diffusion":
+                """
                 for p in self.examList:
                     if p.split("/")[-2] != "Original":
                         e = "error"
                         txt += p.split("/")[-1] + " not in folder Original/ as expected\n"
                 if e == "error":
                     tkMessageBox.showwarning(title="Warning", message="Error in exam folder:\n" + txt)
+                
                 # save parameters and quit
                 elif e == "ok":
-                    for p in self.examList:
-                        self.param["examRep"] += [p]
-                    self.param["process"] = self.process                    
-                    self.destroy()
+                """
+                for p in self.examList:
+                    self.param["examRep"] += [p]
+                self.param["process"] = self.process[:]    
+                if "Preprocess" in self.param["process"]:
+                    if self.preprocOptList is not None:
+                        self.param["preprocOptList"] = self.preprocOptList[:] 
+                if "Register" in self.param["process"]:
+                    if self.regOptList is not None:
+                        self.param["regOptList"] = self.regOptList[:] 
+                if "TBSS" in self.param["process"]:
+                    if self.tbssOptList is not None:
+                        self.param["tbssOptList"] = self.tbssOptList[:] 
+                self.destroy()
 
             # case 2: functional MRI
             # exam folders have to be in folder called Original
